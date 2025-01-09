@@ -30,4 +30,18 @@ public class Constants {
                 leftTriggerAxis = 3,
                 rightTriggerAxis = 4;
     }
+
+    public static final class AutonConstants {
+        // public static double drivekP = 0.5,
+        //                 drivekI = 0.0,
+        //                 drivekD = 0.1,
+
+        //                 steerkP = 0.5,
+        //                 steerkI = 0.0,
+        //                 steerkD = 0.1;
+
+        public static double xP = 0, xI = 0, xD = 0;
+        public static double yP = 0, yI = 0, yD = 0;
+        public static double tP = 0, tI = 0, tD = 0;
+}
 }

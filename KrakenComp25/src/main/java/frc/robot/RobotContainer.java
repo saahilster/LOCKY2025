@@ -72,7 +72,7 @@ public class RobotContainer {
         brakeButton.whileTrue(drivetrain.applyRequest(() -> brake));
         recenterButton.onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
-        //moveButton.whileTrue(new testCMD(0.2, testSub));
+        moveButton.whileTrue(new testCMD(-0.3, testSub));
 
         // joystick.b().whileTrue(drivetrain.applyRequest(() ->
         //     point.withModuleDirection(new Rotation2d(-joystick.getLeftY(), -joystick.getLeftX()))
