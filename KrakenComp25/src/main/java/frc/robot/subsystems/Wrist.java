@@ -4,18 +4,23 @@
 
 package frc.robot.subsystems;
 
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
 
 import edu.wpi.first.wpilibj.motorcontrol.Talon;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.Constants.MotorConstants;
 
-public class TestSub extends SubsystemBase {
-  /** Creates a new TestSub. */
-  private TalonFX motor = new TalonFX(14);
-  public TestSub() {}
+public class Wrist extends SubsystemBase {
+  private final TalonFX wristMotor = new TalonFX(MotorConstants.wrist);
+  private final TalonFX coralIntake = new TalonFX(MotorConstants.coralIntake);
+  /** Creates a new Wrist. */
+  public Wrist() {
+    MotorConfigs();
+  }
 
-  public void Move(double speed){
-    motor.set(speed);
+  private void MotorConfigs(){
+
   }
 
   @Override

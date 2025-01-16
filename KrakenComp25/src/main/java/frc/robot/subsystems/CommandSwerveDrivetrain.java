@@ -7,10 +7,12 @@ import java.util.function.Supplier;
 import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.hardware.Pigeon2;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveRequest;
+import com.ctre.phoenix6.swerve.jni.SwerveJNI.ModulePosition;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -19,15 +21,26 @@ import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.pathfinding.Pathfinder;
 
+import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.controller.HolonomicDriveController;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructArrayPublisher;
+import edu.wpi.first.networktables.StructPublisher;
+import edu.wpi.first.networktables.StructSubscriber;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -37,10 +50,13 @@ import frc.Constants.AutonConstants;
 import frc.robot.generated.TunerConstants;
 import frc.robot.generated.TunerConstants.TunerSwerveDrivetrain;
 
+import org.littletonrobotics.junction.Logger;
+
 /**
  * Class that extends the Phoenix 6 SwerveDrivetrain class and implements
  * Subsystem so it can easily be used in command-based projects.
  */
+@Logged
 public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Subsystem {
     private static final double kSimLoopPeriod = 0.005; // 5 ms
     private Notifier m_simNotifier = null;
@@ -61,9 +77,29 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     private final SwerveRequest.ApplyRobotSpeeds autoRequest = new SwerveRequest.ApplyRobotSpeeds();
 
     private PIDConstants xPID = new PIDConstants(AutonConstants.xP, AutonConstants.xI, AutonConstants.xD);
-    // private PIDConstants yPID = new PIDConstants(AutonConstants.yP,
-    // AutonConstants.yI, AutonConstants.yD);
     private PIDConstants tPID = new PIDConstants(AutonConstants.tP, AutonConstants.tI, AutonConstants.tD);
+
+    private Pigeon2 gyro = new Pigeon2(TunerConstants.kPigeonId);
+
+    // For data logging
+    Pose2d poseA = new Pose2d();
+    Pose2d poseB = new Pose2d();
+
+    StructPublisher<Pose2d> publisher = NetworkTableInstance.getDefault()
+    .getStructTopic("MyPose", Pose2d.struct).publish();
+    StructArrayPublisher<Pose2d> arrayPublisher = NetworkTableInstance.getDefault()
+    .getStructArrayTopic("MyPoseArray", Pose2d.struct).publish();
+
+    private SwerveDriveOdometry swereOdemetry = new SwerveDriveOdometry(
+        fetchKinematics(),
+        GetGyro().getRotation2d(),
+        new SwerveModulePosition[] {
+            new SwerveModulePosition(0, Rotation2d.fromDegrees(0)),
+            new SwerveModulePosition(0, Rotation2d.fromDegrees(0)),
+            new SwerveModulePosition(0, Rotation2d.fromDegrees(0)),
+            new SwerveModulePosition(0, Rotation2d.fromDegrees(0))
+        }
+    );
 
     /*
      * SysId routine for characterizing translation. This is used to find PID gains
@@ -145,7 +181,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         if (Utils.isSimulation()) {
             startSimThread();
         }
-
+        // ZeroYaw();
         configurePathPlanner();
     }
 
@@ -168,11 +204,11 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             SwerveDrivetrainConstants drivetrainConstants,
             double odometryUpdateFrequency,
             SwerveModuleConstants<?, ?, ?>... modules) {
-        super(drivetrainConstants, odometryUpdateFrequency, modules);
+        super(drivetrainConstants, 20, modules);
         if (Utils.isSimulation()) {
             startSimThread();
         }
-
+        // ZeroYaw();
         configurePathPlanner();
     }
 
@@ -209,7 +245,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             Matrix<N3, N1> odometryStandardDeviation,
             Matrix<N3, N1> visionStandardDeviation,
             SwerveModuleConstants<?, ?, ?>... modules) {
-        super(drivetrainConstants, odometryUpdateFrequency, odometryStandardDeviation, visionStandardDeviation,
+        super(drivetrainConstants, 20, odometryStandardDeviation, visionStandardDeviation,
                 modules);
         if (Utils.isSimulation()) {
             startSimThread();
@@ -251,6 +287,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
     @Override
     public void periodic() {
+
+        Logger.recordOutput("pose", GetCurrentPose());
         /*
          * Periodically try to apply the operator perspective.
          * If we haven't applied the operator perspective before, then we should apply
@@ -292,8 +330,16 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         return getKinematics();
     }
 
-    private ChassisSpeeds getChassisSpeeds(){
+    private ChassisSpeeds getChassisSpeeds() {
         return fetchKinematics().toChassisSpeeds(getState().ModuleStates);
+    }
+
+    private Pigeon2 GetGyro() {
+        return gyro;
+    }
+
+    public void ZeroYaw() {
+        gyro.setYaw(0);
     }
 
     private void configurePathPlanner() {
@@ -306,16 +352,24 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             System.err.println("Failed to initialize RobotConfig - cannot configure path planner");
             return; // Return early to prevent NPE
         }
-    
-        // Only proceed with AutoBuilder configuration if config was successfully initialized
+
+        // Only proceed with AutoBuilder configuration if config was successfully
+        // initialized
         AutoBuilder.configure(
-            () -> this.getState().Pose,
-            this::resetPose,
-            this::getChassisSpeeds,
-            (speeds, feedforwards) -> this.setControl(autoRequest.withSpeeds(speeds)),
-            new PPHolonomicDriveController(xPID, tPID),
-            config,  // Now config is guaranteed to be initialized
-            () -> DriverStation.getAlliance().map(alliance -> alliance == DriverStation.Alliance.Red).orElse(false),
-            this);
+                () -> this.getState().Pose,
+                this::resetPose,
+                this::getChassisSpeeds,
+                (speeds, feedforwards) -> this.setControl(autoRequest.withSpeeds(speeds)),
+                new PPHolonomicDriveController(xPID, tPID),
+                config, // Now config is guaranteed to be initialized
+                () -> DriverStation.getAlliance().map(alliance -> alliance == DriverStation.Alliance.Red).orElse(false),
+                this);
+    }
+
+    public Pose2d GetCurrentPose(){
+        poseA = getState().Pose;
+        //this creates the pathing to be very long. No bueno.
+        Pose2d newTranslation = poseA.plus(new Transform2d(new Translation2d(3.4, 4), kBlueAlliancePerspectiveRotation));
+        return poseA;
     }
 }
