@@ -11,11 +11,14 @@ import org.photonvision.PhotonUtils;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
+import frc.robot.RobotContainer;
 
 public class Vision extends SubsystemBase {
   /** Creates a new Vision. */
@@ -23,7 +26,11 @@ public class Vision extends SubsystemBase {
   AprilTagFieldLayout fieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
   private final Transform3d cameraToRobot = new Transform3d(new Translation3d(0, 0, 0), new Rotation3d());
   private Pose3d _pose;
-  
+  RobotContainer rc = RobotContainer.getInstance();
+  CommandSwerveDrivetrain driveTrain = rc.drivetrain;
+
+
+
   public Vision() {}
 
   public Pose3d UpdatePose(){

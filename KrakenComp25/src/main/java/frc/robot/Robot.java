@@ -34,7 +34,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 public class Robot extends LoggedRobot {
   private Command m_autonomousCommand;
 
-  private final RobotContainer m_robotContainer;
+  private RobotContainer m_robotContainer;
 
   public Robot() {
     Logger.recordMetadata("KrankenComp25", "MyProject"); // Set a metadata value
@@ -52,7 +52,8 @@ public class Robot extends LoggedRobot {
     Logger.start();
     SignalLogger.setPath("/media/sda1/ctre-logs/");
     SignalLogger.start();
-    m_robotContainer = new RobotContainer();
+
+    m_robotContainer = RobotContainer.getInstance();
   }
 
   @Override
