@@ -8,13 +8,18 @@ import java.lang.constant.DirectMethodHandleDesc.Kind;
 
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonUtils;
+import org.photonvision.targeting.PhotonPipelineResult;
+
+import com.ctre.phoenix6.Utils;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -24,19 +29,40 @@ public class Vision extends SubsystemBase {
   /** Creates a new Vision. */
   private final PhotonCamera camera = new PhotonCamera(getName());
   AprilTagFieldLayout fieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
-  private final Transform3d cameraToRobot = new Transform3d(new Translation3d(0, 0, 0), new Rotation3d());
+  private final Transform3d cameraToRobot = new Transform3d(new Translation3d(0, 12.25, 0), new Rotation3d());
+  private Transform3d cameraToTarget;
   private Pose3d _pose;
   RobotContainer rc = RobotContainer.getInstance();
   CommandSwerveDrivetrain driveTrain = rc.drivetrain;
 
+  public Vision() {
+  }
 
+  public void UpdatePose() {
+    Pose3d rawPose = PhotonUtils.estimateFieldToRobotAprilTag(cameraToRobot, _pose, cameraToRobot);
+    Pose2d filteredPose = new Pose2d(new Translation2d(rawPose.getX(), rawPose.getY()),
+        rawPose.getRotation().toRotation2d());
+    driveTrain.addVisionMeasurement(filteredPose, Utils.getCurrentTimeSeconds());
+  }
 
-  public Vision() {}
+  // TODO: Find translation and rotation distances from april tags
+  // TODO: Find how to drive request to position based off of april tags
+  public void TargetReef() {
+    boolean targetVisible = false;
+    double targetRange = 0.0;
+    var results = camera.getAllUnreadResults();
+    if (!results.isEmpty()) {
+      var result = results.get(results.size() -1);
+      if (result.hasTargets()){
+        System.out.println("results found");
 
-  public Pose3d UpdatePose(){
-    var result = camera.getAllUnreadResults();
-    Pose3d currentPose = PhotonUtils.estimateFieldToRobotAprilTag(cameraToRobot, _pose, cameraToRobot);
-    return currentPose;
+        for(var target : result.getTargets()){
+          if(target.getFiducialId() == 1){
+            
+          }
+        }
+      }
+    }
   }
 
   @Override
