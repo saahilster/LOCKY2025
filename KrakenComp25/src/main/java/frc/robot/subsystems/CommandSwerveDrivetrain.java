@@ -85,11 +85,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     Pose2d poseA = new Pose2d();
     Pose2d poseB = new Pose2d();
 
-    StructPublisher<Pose2d> publisher = NetworkTableInstance.getDefault()
-    .getStructTopic("MyPose", Pose2d.struct).publish();
-    StructArrayPublisher<Pose2d> arrayPublisher = NetworkTableInstance.getDefault()
-    .getStructArrayTopic("MyPoseArray", Pose2d.struct).publish();
-
     private SwerveDriveOdometry swereOdemetry = new SwerveDriveOdometry(
         fetchKinematics(),
         GetGyro().getRotation2d(),

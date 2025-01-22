@@ -54,11 +54,11 @@ public class Constants {
     }
 
     public static final class MotorConstants {
-        public static final int leftCascade= 0,
-        rightCascade = 0,
-        pivot = 0,
-        algaeIntake = 0,
-        wrist = 0,
-        coralIntake = 0;
+        public static final int leftCascadeID= 14,
+        rightCascadeID = 15,
+        algaeIntakeID = 16,
+        wristMotorID = 17,
+        coralIntakeID = 18,
+        climbMotorID = 19;
     }
 }

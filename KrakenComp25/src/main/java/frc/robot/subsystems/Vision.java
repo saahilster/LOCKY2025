@@ -24,6 +24,7 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import frc.robot.RobotContainer;
+import frc.robot.generated.TunerConstants;
 
 public class Vision extends SubsystemBase {
   /** Creates a new Vision. */
@@ -32,8 +33,14 @@ public class Vision extends SubsystemBase {
   private final Transform3d cameraToRobot = new Transform3d(new Translation3d(0, 12.25, 0), new Rotation3d());
   private Transform3d cameraToTarget;
   private Pose3d _pose;
+
+  //references from robot container
   RobotContainer rc = RobotContainer.getInstance();
   CommandSwerveDrivetrain driveTrain = rc.drivetrain;
+  double forward = -rc.driver.getLeftY() * rc.MaxSpeed;
+  double strafe = -rc.driver.getLeftY() * rc.MaxSpeed;
+  double steer = -rc.driver.getLeftY() * rc.MaxAngularRate;
+
 
   public Vision() {
   }
@@ -50,6 +57,7 @@ public class Vision extends SubsystemBase {
   public void TargetReef() {
     boolean targetVisible = false;
     double targetRange = 0.0;
+    double targetYaw = 0.0;
     var results = camera.getAllUnreadResults();
     if (!results.isEmpty()) {
       var result = results.get(results.size() -1);
@@ -58,7 +66,8 @@ public class Vision extends SubsystemBase {
 
         for(var target : result.getTargets()){
           if(target.getFiducialId() == 1){
-            
+            targetYaw = target.getYaw();
+            targetRange = PhotonUtils.calculateDistanceToTargetMeters(targetYaw, targetYaw, targetRange, targetYaw);
           }
         }
       }

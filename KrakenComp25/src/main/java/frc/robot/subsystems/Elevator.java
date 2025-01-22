@@ -15,10 +15,11 @@ import frc.Constants.MotorConstants;
 
 public class Elevator extends SubsystemBase {
   /** Creates a new Elevator. */
-  private final TalonFX leftMotor = new TalonFX(MotorConstants.leftCascade);
-  private final TalonFX rightMotor = new TalonFX(MotorConstants.rightCascade);
-  Follower follower = new Follower(0, false);
+  private final TalonFX leftMotor = new TalonFX(MotorConstants.leftCascadeID);
+  private final TalonFX rightMotor = new TalonFX(MotorConstants.rightCascadeID);
+  Follower follower = new Follower(0, true);
 
+  private final double elevatorGearRatio = 100;
   final MotionMagicVoltage mmRequest = new MotionMagicVoltage(0);
 
   public Elevator() {
@@ -36,13 +37,13 @@ public class Elevator extends SubsystemBase {
     leftMotor.set(speed);
   }
 
-  public void MagicMove(double degrees){
-    double proccessDegrees = degrees / 360;
-    leftMotor.setControl(mmRequest.withPosition(proccessDegrees));
+  public void MagicMove(double feet){
+    leftMotor.setControl(mmRequest.withPosition(feet));
   }
 
   private void MotorConfig(){
     var cascadeConfig = new TalonFXConfiguration();
+    cascadeConfig.Feedback.SensorToMechanismRatio = elevatorGearRatio;
     var slot0Config = cascadeConfig.Slot0;
     slot0Config.kS = 0;
     slot0Config.kV = 0;
@@ -58,6 +59,11 @@ public class Elevator extends SubsystemBase {
     leftMotor.getConfigurator().apply(slot0Config);
     rightMotor.getConfigurator().apply(slot0Config);
 
+  }
+
+  //TODO: Set limits
+  public boolean ElevatorLimits(){
+    return false;
   }
 
   @Override

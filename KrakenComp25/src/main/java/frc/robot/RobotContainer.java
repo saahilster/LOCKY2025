@@ -28,13 +28,21 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.Constants.ControllerConstants;
 import frc.robot.generated.TunerConstants;
+import frc.robot.subsystems.Climb;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.subsystems.Elevator;
+import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.Wrist;
 
 public class RobotContainer {
     private static RobotContainer instance;
+    public static Elevator elevatorSub = new Elevator();
+    public static Intake intakeSub = new Intake();
+    public static Wrist wristSub = new Wrist();
+    public static Climb climbSub = new Climb();
 
-    private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
-    private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
+    public double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
+    public double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
     /* Setting up bindings for necessary control of the swerve drive platform */
     private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
             .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
@@ -46,13 +54,16 @@ public class RobotContainer {
 
     private SendableChooser<Command> autoChooser;
 
-    private final PS5Controller joystick = new PS5Controller(0);
+    public final PS5Controller driver = new PS5Controller(0);
+    public final PS5Controller operator = new PS5Controller(1);
 
-    //Inputs
-    private final JoystickButton brakeButton = new JoystickButton(joystick, ControllerConstants.b_L2);
-    private final JoystickButton slowButton = new JoystickButton(joystick, ControllerConstants.b_R2);
-    private final JoystickButton recenterButton = new JoystickButton(joystick, ControllerConstants.b_L1);
-    private final JoystickButton moveButton = new JoystickButton(joystick, ControllerConstants.b_O);
+    //DRIVER INPUTS
+    private final JoystickButton brakeButton = new JoystickButton(driver, ControllerConstants.b_L2);
+    private final JoystickButton slowButton = new JoystickButton(driver, ControllerConstants.b_R2);
+    private final JoystickButton recenterButton = new JoystickButton(driver, ControllerConstants.b_L1);
+    private final JoystickButton moveButton = new JoystickButton(driver, ControllerConstants.b_O);
+
+    //OPERATOR INPUTS
 
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
@@ -76,24 +87,32 @@ public class RobotContainer {
         drivetrain.setDefaultCommand(
             // Drivetrain will execute this command periodically
             drivetrain.applyRequest(() ->
-                drive.withVelocityX(-joystick.getLeftY() * MaxSpeed) // Drive forward with negative Y (forward)
-                    .withVelocityY(-joystick.getLeftX() * MaxSpeed) // Drive left with negative X (left)
-                    .withRotationalRate(-joystick.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
+                drive.withVelocityX(-driver.getLeftY() * MaxSpeed) // Drive forward with negative Y (forward)
+                    .withVelocityY(-driver.getLeftX() * MaxSpeed) // Drive left with negative X (left)
+                    .withRotationalRate(-driver.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
             )
         );
 
         slowButton.whileTrue(drivetrain.applyRequest(() ->
-        drive.withVelocityX(-joystick.getLeftY() * 1.5) // Drive forward with negative Y (forward)
-            .withVelocityY(-joystick.getLeftX() * 1.5) // Drive left with negative X (left)
-            .withRotationalRate(-joystick.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
+        drive.withVelocityX(-driver.getLeftY() * 1.5) // Drive forward with negative Y (forward)
+            .withVelocityY(-driver.getLeftX() * 1.5) // Drive left with negative X (left)
+            .withRotationalRate(-driver.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
         ));
 
         brakeButton.whileTrue(drivetrain.applyRequest(() -> brake));
         recenterButton.onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
-        // joystick.b().whileTrue(drivetrain.applyRequest(() ->
-        //     point.withModuleDirection(new Rotation2d(-joystick.getLeftY(), -joystick.getLeftX()))
-        // ));
+
+        //OPERATOR BINDINGS
+        
+
+
+        //MANUAL CONTROLS 
+        //0.5 added to half the max speed of the elevator and wrist
+        elevatorSub.setDefaultCommand(new RunCommand(()-> elevatorSub.ManualMove(operator.getLeftY() * 0.5), elevatorSub));
+        wristSub.setDefaultCommand(new RunCommand(()-> wristSub.ManualMove(operator.getLeftX() * 0.5), wristSub));
+        climbSub.setDefaultCommand(new RunCommand(()-> climbSub.Move(operator.getRightY()), climbSub));
+
 
         // // Run SysId routines when holding back/start and X/Y.
         // // Note that each routine should be run exactly once in a single log.
