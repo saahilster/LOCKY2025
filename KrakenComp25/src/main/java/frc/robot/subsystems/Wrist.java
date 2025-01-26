@@ -4,27 +4,63 @@
 
 package frc.robot.subsystems;
 
+import static edu.wpi.first.units.Units.Seconds;
+import static edu.wpi.first.units.Units.Volt;
+import static edu.wpi.first.units.Units.Volts;
+
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
-
-import edu.wpi.first.wpilibj.motorcontrol.Talon;
+import com.ctre.phoenix6.controls.VoltageOut;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.Velocity;
+import edu.wpi.first.wpilibj.motorcontrol.Talon;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.Constants.MotorConstants;
+import com.ctre.phoenix6.SignalLogger;
 
 public class Wrist extends SubsystemBase {
-  //references
+  // references
   private final TalonFX wristMotor = new TalonFX(MotorConstants.wristMotorID);
   private final TalonFX coralIntake = new TalonFX(MotorConstants.coralIntakeID);
-  final MotionMagicVoltage mmRequest = new MotionMagicVoltage(0);
+
+  private VoltageOut vOut = new VoltageOut(0);
+
+  private final SysIdRoutine sysIdRoutine = new SysIdRoutine(
+      new SysIdRoutine.Config(
+          null,
+          Volt.of(3),
+          Seconds.of(3),
+          state -> SignalLogger.writeString("state", state.toString())),
+      new SysIdRoutine.Mechanism(
+          volts -> wristMotor.setControl(vOut.withOutput(volts.in(Volt))),
+          null,
+          this));
+
+  public Command sysIDQuasistatic(SysIdRoutine.Direction direction) {
+    return sysIdRoutine.quasistatic(direction);
+  }
+
+  public Command sysIDDynamic(SysIdRoutine.Direction direction) {
+    return sysIdRoutine.dynamic(direction);
+  }
 
   private final double gearRatio = 100;
+
   /** Creates a new Wrist. */
   public Wrist() {
     MotorConfigs();
   }
 
-  private void MotorConfigs(){
+  private void MotorConfigs() {
     var wristConfig = new TalonFXConfiguration();
     var slot0Config = wristConfig.Slot0;
     slot0Config.kS = 0;
@@ -42,21 +78,26 @@ public class Wrist extends SubsystemBase {
     wristMotor.getConfigurator().apply(slot0Config);
   }
 
-  public void ManualMove(double speed){
+  public void ManualMove(double speed) {
     wristMotor.set(speed);
   }
 
-  public void RotatePivot(double degrees){
-    double processedDegrees = degrees / 360;
-    wristMotor.setControl(mmRequest.withPosition(processedDegrees));
+  public void RotateWrist(double degrees) {
+    MotionMagicVoltage request = new MotionMagicVoltage(Units.degreesToRotations(degrees));
+    wristMotor.setControl(request);
   }
 
-  public boolean WristLimit(){
+  private double WristAngle() {
+    return wristMotor.getPosition().getValueAsDouble() / 360;
+  }
+
+  public boolean WristLimit() {
     return false;
   }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    SmartDashboard.putNumber("Degrees", WristAngle());
   }
 }

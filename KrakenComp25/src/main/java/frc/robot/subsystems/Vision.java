@@ -5,9 +5,13 @@
 package frc.robot.subsystems;
 
 import java.lang.constant.DirectMethodHandleDesc.Kind;
+import java.util.Optional;
 
+import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
+import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonUtils;
+import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.photonvision.targeting.PhotonPipelineResult;
 
 import com.ctre.phoenix6.Utils;
@@ -29,10 +33,13 @@ import frc.robot.generated.TunerConstants;
 public class Vision extends SubsystemBase {
   /** Creates a new Vision. */
   private final PhotonCamera camera = new PhotonCamera(getName());
+
+  //Pose estimation
   AprilTagFieldLayout fieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
   private final Transform3d cameraToRobot = new Transform3d(new Translation3d(0, 12.25, 0), new Rotation3d());
   private Transform3d cameraToTarget;
   private Pose3d _pose;
+  PhotonPoseEstimator poseEstimator = new PhotonPoseEstimator(fieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, cameraToRobot);
 
   //references from robot container
   RobotContainer rc = RobotContainer.getInstance();
@@ -44,13 +51,19 @@ public class Vision extends SubsystemBase {
 
   public Vision() {
   }
+  // public Optional<EstimatedRobotPose> getEsti
 
-  public void UpdatePose() {
-    Pose3d rawPose = PhotonUtils.estimateFieldToRobotAprilTag(cameraToRobot, _pose, cameraToRobot);
-    Pose2d filteredPose = new Pose2d(new Translation2d(rawPose.getX(), rawPose.getY()),
-        rawPose.getRotation().toRotation2d());
-    driveTrain.addVisionMeasurement(filteredPose, Utils.getCurrentTimeSeconds());
-  }
+  // public void UpdatePose() {
+  //   Transform3d photonTransform;
+  //   var result = camera.getLatestResult();
+  //   //   var target = result.getultiTagResult();
+  //   }
+
+  //   Pose3d rawPose = PhotonUtils.estimateFieldToRobotAprilTag(cameraToRobot, _pose, cameraToRobot);
+  //   Pose2d filteredPose = new Pose2d(new Translation2d(rawPose.getX(), rawPose.getY()),
+  //       rawPose.getRotation().toRotation2d());
+  //   // driveTrain.addVisionMeasurement(filteredPose, Utils.getCurrentTimeSeconds());
+  // }
 
   // TODO: Find translation and rotation distances from april tags
   // TODO: Find how to drive request to position based off of april tags
