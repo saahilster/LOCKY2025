@@ -10,9 +10,15 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.Constants.MotorConstants;
 
 public class Climb extends SubsystemBase {
-  double gearRatio = 0;
-  private final TalonFX climbMotor = new TalonFX(MotorConstants.climbMotorID);
+  private final TalonFX climbMotor = new TalonFX(MotorConstants.climbMotorID, "Other");
+  private static Climb instance;
 
+  public static Climb getInstance(){
+    if(instance == null){
+      instance = new Climb();
+    }
+    return instance;
+  }
 
   /** Creates a new Climb. */
   public Climb() {}

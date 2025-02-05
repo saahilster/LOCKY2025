@@ -27,10 +27,10 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.Constants.MotorConstants;
 import com.ctre.phoenix6.SignalLogger;
 
+//TODO: DEPRECATE THIS SUB
 public class Wrist extends SubsystemBase {
   // references
   private final TalonFX wristMotor = new TalonFX(MotorConstants.wristMotorID);
-  private final TalonFX coralIntake = new TalonFX(MotorConstants.coralIntakeID);
 
   private VoltageOut vOut = new VoltageOut(0);
 

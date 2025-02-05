@@ -27,22 +27,32 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.Constants.ControllerConstants;
+import frc.robot.commands.AlgaeIntake;
+import frc.robot.commands.CascadeMove;
 import frc.robot.generated.TunerConstants;
+import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Climb;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.LED;
+import frc.robot.subsystems.Vision;
 import frc.robot.subsystems.Wrist;
 
 public class RobotContainer {
+
+    //fetching instances of subsystems
     private static RobotContainer instance;
-    public static Elevator elevatorSub = new Elevator();
-    public static Intake intakeSub = new Intake();
-    public static Wrist wristSub = new Wrist();
-    public static Climb climbSub = new Climb();
+    private Elevator elevatorSub = Elevator.getInstance();
+    private LED ledSub = LED.getInstance();
+    public Intake intakeSub = new Intake();
+    // private static Vision visionSub = Vision.getInstance(); 
+    private Arm armSub = Arm.getInstance();
+    private Climb climbSub = Climb.getInstance();
 
     public double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
-    public double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
+    public double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max
+                                                                                     // angular velocity
     /* Setting up bindings for necessary control of the swerve drive platform */
     private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
             .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
@@ -57,18 +67,33 @@ public class RobotContainer {
     public final PS5Controller driver = new PS5Controller(0);
     public final PS5Controller operator = new PS5Controller(1);
 
-    //DRIVER INPUTS
+    // DRIVER INPUTS
     private final JoystickButton brakeButton = new JoystickButton(driver, ControllerConstants.b_L2);
     private final JoystickButton slowButton = new JoystickButton(driver, ControllerConstants.b_R2);
     private final JoystickButton recenterButton = new JoystickButton(driver, ControllerConstants.b_L1);
     private final JoystickButton moveButton = new JoystickButton(driver, ControllerConstants.b_O);
+    private final JoystickButton intakeButton = new JoystickButton(driver, ControllerConstants.b_X);
+    private final JoystickButton outTakeButton = new JoystickButton(driver, ControllerConstants.b_O);
+    private final JoystickButton ledTestButton = new JoystickButton(driver, ControllerConstants.b_TRI);
 
-    //OPERATOR INPUTS
+    // OPERATOR INPUTS
+
+    private final JoystickButton armUp = new JoystickButton(operator, ControllerConstants.b_R1);
+    private final JoystickButton armDown = new JoystickButton(operator, ControllerConstants.b_L1);
+    private final JoystickButton elevUp = new JoystickButton(operator, ControllerConstants.b_R2);
+    private final JoystickButton elevDown = new JoystickButton(operator, ControllerConstants.b_L2);
+
+
+    // SysID tuning will be on operator controller
+    private final JoystickButton dyanamicForward = new JoystickButton(operator, ControllerConstants.b_SQR);
+    private final JoystickButton dyanamicBackward = new JoystickButton(operator, ControllerConstants.b_X);
+    private final JoystickButton quasiForward = new JoystickButton(operator, ControllerConstants.b_TRI);
+    private final JoystickButton quasiBackward = new JoystickButton(operator, ControllerConstants.b_O);
 
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
-    public static RobotContainer getInstance(){
-        if(instance == null){
+    public static RobotContainer getInstance() {
+        if (instance == null) {
             instance = new RobotContainer();
         }
         return instance;
@@ -76,7 +101,8 @@ public class RobotContainer {
 
     public RobotContainer() {
 
-        NamedCommands.registerCommand("Recenter", drivetrain.runOnce(()-> drivetrain.seedFieldCentric()).withTimeout(0.1));
+        NamedCommands.registerCommand("Recenter",
+                drivetrain.runOnce(() -> drivetrain.seedFieldCentric()).withTimeout(0.1));
         drivetrain.resetPose(new Pose2d(new Translation2d(3.4, 4), new Rotation2d(0)));
         configureBindings();
     }
@@ -85,34 +111,51 @@ public class RobotContainer {
         // Note that X is defined as forward according to WPILib convention,
         // and Y is defined as to the left according to WPILib convention.
         drivetrain.setDefaultCommand(
-            // Drivetrain will execute this command periodically
-            drivetrain.applyRequest(() ->
-                drive.withVelocityX(-driver.getLeftY() * MaxSpeed) // Drive forward with negative Y (forward)
-                    .withVelocityY(-driver.getLeftX() * MaxSpeed) // Drive left with negative X (left)
-                    .withRotationalRate(-driver.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
-            )
-        );
+                // Drivetrain will execute this command periodically
+                drivetrain.applyRequest(() -> drive.withVelocityX(-driver.getLeftY() * MaxSpeed) // Drive forward with
+                                                                                                 // negative Y (forward)
+                        .withVelocityY(-driver.getLeftX() * MaxSpeed) // Drive left with negative X (left)
+                        .withRotationalRate(-driver.getRightX() * MaxAngularRate) // Drive counterclockwise with
+                                                                                  // negative X (left)
+                ));
 
-        slowButton.whileTrue(drivetrain.applyRequest(() ->
-        drive.withVelocityX(-driver.getLeftY() * 1.5) // Drive forward with negative Y (forward)
-            .withVelocityY(-driver.getLeftX() * 1.5) // Drive left with negative X (left)
-            .withRotationalRate(-driver.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
+        
+        slowButton.whileTrue(drivetrain.applyRequest(() -> drive.withVelocityX(-driver.getLeftY() * 1.5) // Drive
+                                                                                                         // forward with
+                                                                                                         // negative Y
+                                                                                                         // (forward)
+                .withVelocityY(-driver.getLeftX() * 1.5) // Drive left with negative X (left)
+                .withRotationalRate(-driver.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X
+                                                                          // (left)
         ));
+        slowButton.whileTrue(new RunCommand(()-> ledSub.ChangeLED(240, 200, 90), ledSub));
+        slowButton.whileFalse(new RunCommand(()-> ledSub.ChangeLED(0, 0, 0), ledSub));
+
 
         brakeButton.whileTrue(drivetrain.applyRequest(() -> brake));
         recenterButton.onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+        intakeButton.whileTrue(new AlgaeIntake(0.8, intakeSub));
+        outTakeButton.whileTrue(new AlgaeIntake(-0.8, intakeSub));
+
+        // OPERATOR BINDINGS
+        // For SysID
+
+        dyanamicForward.whileTrue(elevatorSub.sysDynamic(Direction.kForward));
+        dyanamicBackward.whileTrue(elevatorSub.sysDynamic(Direction.kReverse));
+        quasiForward.whileTrue(elevatorSub.sysDynamic(Direction.kForward));
+        quasiBackward.whileTrue(elevatorSub.sysDynamic(Direction.kReverse));
 
 
-        //OPERATOR BINDINGS
-        
+        ledTestButton.onTrue(new RunCommand(() -> ledSub.TestLED(), ledSub));
 
+        climbSub.setDefaultCommand(new RunCommand(()-> climbSub.Move(operator.getLeftX() * 0.2), climbSub));
+        elevatorSub.setDefaultCommand(new RunCommand(()-> elevatorSub.ManualMove(operator.getLeftY() * 0.4), elevatorSub));
+        armSub.setDefaultCommand(new RunCommand(()-> armSub.ManualMove(-operator.getRightY() * 0.2), armSub));
 
-        //MANUAL CONTROLS 
-        //0.5 added to half the max speed of the elevator and wrist
-        elevatorSub.setDefaultCommand(new RunCommand(()-> elevatorSub.ManualMove(operator.getLeftY() * 0.5), elevatorSub));
-        wristSub.setDefaultCommand(new RunCommand(()-> wristSub.ManualMove(operator.getLeftX() * 0.5), wristSub));
-        climbSub.setDefaultCommand(new RunCommand(()-> climbSub.Move(operator.getRightY()), climbSub));
-
+        // armUp.whileTrue(new ArmMove(armSub, 0.1));
+        // armDown.whileTrue(new ArmMove(armSub, -0.1));
+        // elevUp.whileTrue(new CascadeMove(0.2, elevatorSub));
+        // elevDown.whileTrue(new CascadeMove(-0.2, elevatorSub));
 
         // // Run SysId routines when holding back/start and X/Y.
         // // Note that each routine should be run exactly once in a single log.
@@ -125,11 +168,10 @@ public class RobotContainer {
 
         drivetrain.registerTelemetry(logger::telemeterize);
 
-        //AUTONOMOUS
+        // AUTONOMOUS
         autoChooser = AutoBuilder.buildAutoChooser();
         SmartDashboard.putData("Auto Chooser", autoChooser);
     }
-
 
     public Command getAutonomousCommand() {
         return autoChooser.getSelected();
