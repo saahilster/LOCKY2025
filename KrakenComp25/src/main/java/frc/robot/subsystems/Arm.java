@@ -4,14 +4,18 @@
 
 package frc.robot.subsystems;
 
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
 import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.Constants.MotorConstants;
@@ -32,17 +36,25 @@ public class Arm extends SubsystemBase {
 
   private final SysIdRoutine armRoutine = new SysIdRoutine(
       new SysIdRoutine.Config(
-          null,
-          Volts.of(3),
+          Volts.per(Seconds).of(0.2),
+          Volts.of(0.5),
           Seconds.of(3),
-          state -> SignalLogger.writeString("state", state.toString())),
+          state -> SignalLogger.writeString("arm state", state.toString())),
       new SysIdRoutine.Mechanism(
           volts -> armMotor.setControl(vOut.withOutput(volts.in(Volts))),
           null,
           this));
 
+  public Command sysDynamic(SysIdRoutine.Direction direction){
+      return armRoutine.dynamic(direction);
+    }
+    public Command sysQuasistatic(SysIdRoutine.Direction direction){
+      return armRoutine.quasistatic(direction);
+    }
+
   public Arm() {
     Config();
+    SignalLogger.start();
   }
 
   public void ManualMove(double speed){
@@ -66,6 +78,17 @@ public class Arm extends SubsystemBase {
     armMM.MotionMagicJerk = 0;
     armMotor.getConfigurator().apply(slot0Config);
   }
+
+  public double GetAngle(){
+    return armMotor.getPosition().getValue().in(Degrees);
+  }
+
+  public void MagicMove(double degrees){
+    MotionMagicVoltage request = new MotionMagicVoltage(Units.degreesToRotations(degrees));
+    armMotor.setControl(request);
+  }
+
+
 
   @Override
   public void periodic() {

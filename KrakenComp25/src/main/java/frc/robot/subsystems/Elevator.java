@@ -42,7 +42,8 @@ public class Elevator extends SubsystemBase {
 
   private VoltageOut vOut = new VoltageOut(0);
   private static final double elevatorGearRatio = 100;
-  private static final double armGearRatio = 100;
+  private static final double spoolDiameter = 0;
+  private static final double maxHeight = 0;
 
   private LED ledSub = LED.getInstance();
 
@@ -89,7 +90,6 @@ public class Elevator extends SubsystemBase {
     BrakeMode();
     rightMotor.setControl(follower);
     CascadeConfig();
-    ArmConfig();
     SignalLogger.start();
   }
 
@@ -125,24 +125,6 @@ public class Elevator extends SubsystemBase {
     elevateMM.MotionMagicJerk = 0;
     leftMotor.getConfigurator().apply(slot0Config);
     rightMotor.getConfigurator().apply(slot0Config);
-  }
-
-  private void ArmConfig() {
-    var armConfig = new TalonFXConfiguration();
-    armConfig.Feedback.SensorToMechanismRatio = armGearRatio;
-    var slot0Config = armConfig.Slot0;
-    slot0Config.kS = 0;
-    slot0Config.kV = 0;
-    slot0Config.kA = 0;
-    slot0Config.kP = 0;
-    slot0Config.kI = 0;
-    slot0Config.kD = 0;
-
-    var armMM = armConfig.MotionMagic;
-    armMM.MotionMagicCruiseVelocity = 0;
-    armMM.MotionMagicAcceleration = 0;
-    armMM.MotionMagicJerk = 0;
-    leftMotor.getConfigurator().apply(slot0Config);
   }
 
   public void ArmManual(double speed){
