@@ -45,10 +45,10 @@ public class RobotContainer {
     private static RobotContainer instance;
     private Elevator elevatorSub = Elevator.getInstance();
     private LED ledSub = LED.getInstance();
-    // public Intake intakeSub = new Intake();
+    public Intake intakeSub = new Intake();
     // private static Vision visionSub = Vision.getInstance(); 
     private Arm armSub = Arm.getInstance();
-    private Climb climbSub = Climb.getInstance();
+    // private Climb climbSub = Climb.getInstance();
 
     public double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
     public double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max
@@ -134,23 +134,23 @@ public class RobotContainer {
 
         brakeButton.whileTrue(drivetrain.applyRequest(() -> brake));
         recenterButton.onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
-        // intakeButton.whileTrue(new AlgaeIntake(0.8, intakeSub));
-        // outTakeButton.whileTrue(new AlgaeIntake(-0.8, intakeSub));
+        intakeButton.whileTrue(new AlgaeIntake(0.8, intakeSub));
+        outTakeButton.whileTrue(new AlgaeIntake(-0.8, intakeSub));
 
         // OPERATOR BINDINGS
         // For SysID
 
-        dyanamicForward.whileTrue(armSub.sysDynamic(Direction.kForward));
-        dyanamicBackward.whileTrue(armSub.sysDynamic(Direction.kReverse));
-        quasiForward.whileTrue(armSub.sysDynamic(Direction.kForward));
-        quasiBackward.whileTrue(armSub.sysDynamic(Direction.kReverse));
+        // dyanamicForward.whileTrue(armSub.sysDynamic(Direction.kForward));
+        // dyanamicBackward.whileTrue(armSub.sysDynamic(Direction.kReverse));
+        // quasiForward.whileTrue(armSub.sysQuasistatic(Direction.kForward));
+        // quasiBackward.whileTrue(armSub.sysQuasistatic(Direction.kReverse));
 
 
         ledTestButton.onTrue(new RunCommand(() -> ledSub.TestLED(), ledSub));
 
-        climbSub.setDefaultCommand(new RunCommand(()-> climbSub.Move(operator.getLeftX() * 0.1), climbSub));
+        intakeSub.setDefaultCommand(new RunCommand(()-> intakeSub.MovePivot(operator.getLeftX() * 0.1), intakeSub));
         elevatorSub.setDefaultCommand(new RunCommand(()-> elevatorSub.ManualMove(operator.getLeftY() * 0.9), elevatorSub));
-        armSub.setDefaultCommand(new RunCommand(()-> armSub.ManualMove(-operator.getRightY() * 0.7), armSub));
+        armSub.setDefaultCommand(new RunCommand(()-> armSub.ManualMove(-operator.getRightY() * 0.5), armSub));
 
         // armUp.whileTrue(new ArmMove(armSub, 0.1));
         // armDown.whileTrue(new ArmMove(armSub, -0.1));

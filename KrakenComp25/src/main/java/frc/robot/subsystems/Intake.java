@@ -14,6 +14,7 @@ import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
+import edu.wpi.first.wpilibj.motorcontrol.Talon;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
@@ -29,6 +30,7 @@ import javax.print.attribute.standard.MediaSize.Other;
 public class Intake extends SubsystemBase {
   /** Creates a new Intake. */
   private final TalonFX intakeMotor = new TalonFX(MotorConstants.algaeIntakeID, "Other");
+  private final TalonFX pivotMotor = new TalonFX(21, "Other");
   private LED ledSUb = LED.getInstance();
 
   public Intake() {
@@ -38,6 +40,10 @@ public class Intake extends SubsystemBase {
   public void MoveIntake(double speed){
     intakeMotor.set(speed);
     ledSUb.Intaking();
+  }
+
+  public void MovePivot(double speed){
+    pivotMotor.set(speed);
   }
 
 

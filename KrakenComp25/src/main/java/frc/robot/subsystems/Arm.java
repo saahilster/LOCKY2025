@@ -36,9 +36,9 @@ public class Arm extends SubsystemBase {
 
   private final SysIdRoutine armRoutine = new SysIdRoutine(
       new SysIdRoutine.Config(
-          Volts.per(Seconds).of(0.2),
-          Volts.of(0.5),
-          Seconds.of(3),
+          Volts.per(Seconds).of(0.35),
+          Volts.of(0.65),
+          Seconds.of(5),
           state -> SignalLogger.writeString("arm state", state.toString())),
       new SysIdRoutine.Mechanism(
           volts -> armMotor.setControl(vOut.withOutput(volts.in(Volts))),
@@ -65,18 +65,20 @@ public class Arm extends SubsystemBase {
     var armConfig = new TalonFXConfiguration();
     armConfig.Feedback.SensorToMechanismRatio = gearRatio;
     var slot0Config = armConfig.Slot0;
-    slot0Config.kS = 0;
-    slot0Config.kV = 0;
-    slot0Config.kA = 0;
-    slot0Config.kP = 0;
+    slot0Config.kS = 0.18405;
+    slot0Config.kV = 9.5916;
+    slot0Config.kA = 0.97255;
+    slot0Config.kG = 38.404;
+    slot0Config.kP = 58.161;
     slot0Config.kI = 0;
-    slot0Config.kD = 0;
+    slot0Config.kD = 13.754;
 
     var armMM = armConfig.MotionMagic;
-    armMM.MotionMagicCruiseVelocity = 0;
-    armMM.MotionMagicAcceleration = 0;
+    armMM.MotionMagicCruiseVelocity = 0.9;
+    armMM.MotionMagicAcceleration = 2.7;
     armMM.MotionMagicJerk = 0;
-    armMotor.getConfigurator().apply(slot0Config);
+    // armMotor.getConfigurator().apply(slot0Config);
+    armMotor.getConfigurator().apply(armConfig);
   }
 
   public double GetAngle(){

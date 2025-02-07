@@ -58,7 +58,9 @@ public class Constants {
         rightCascadeID = 15,
         algaeIntakeID = 16,
         wristMotorID = 17,
-        coralIntakeID = 18,
-        climbMotorID = 19;
+        algaePivot = 18,
+        climbMotorID = 19,
+        CANdleID = 20;
+        
     }
 }
