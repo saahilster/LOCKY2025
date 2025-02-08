@@ -13,6 +13,7 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.InvertedValue;
 
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -64,6 +65,7 @@ public class Arm extends SubsystemBase {
   private void Config() {
     var armConfig = new TalonFXConfiguration();
     armConfig.Feedback.SensorToMechanismRatio = gearRatio;
+    armConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
     var slot0Config = armConfig.Slot0;
     slot0Config.kS = 0.18405;
     slot0Config.kV = 9.5916;
@@ -74,9 +76,9 @@ public class Arm extends SubsystemBase {
     slot0Config.kD = 13.754;
 
     var armMM = armConfig.MotionMagic;
-    armMM.MotionMagicCruiseVelocity = 0.9;
-    armMM.MotionMagicAcceleration = 2.7;
-    armMM.MotionMagicJerk = 0;
+    armMM.withMotionMagicCruiseVelocity(01.).
+    withMotionMagicAcceleration(0.1).
+    withMotionMagicJerk(0);
     // armMotor.getConfigurator().apply(slot0Config);
     armMotor.getConfigurator().apply(armConfig);
   }
@@ -95,5 +97,6 @@ public class Arm extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    // System.out.println(GetAngle());
   }
 }

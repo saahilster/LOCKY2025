@@ -25,9 +25,11 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.Constants.ControllerConstants;
 import frc.robot.commands.AlgaeIntake;
+import frc.robot.commands.ArmMagic;
 import frc.robot.commands.CascadeMove;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.Arm;
@@ -82,6 +84,8 @@ public class RobotContainer {
     private final JoystickButton armDown = new JoystickButton(operator, ControllerConstants.b_L1);
     private final JoystickButton elevUp = new JoystickButton(operator, ControllerConstants.b_R2);
     private final JoystickButton elevDown = new JoystickButton(operator, ControllerConstants.b_L2);
+    private final POVButton armPosUp = new POVButton(operator, 0);
+    private final POVButton armPosDown = new POVButton(operator, 180);
 
 
     // SysID tuning will be on operator controller
@@ -144,6 +148,9 @@ public class RobotContainer {
         // dyanamicBackward.whileTrue(armSub.sysDynamic(Direction.kReverse));
         // quasiForward.whileTrue(armSub.sysQuasistatic(Direction.kForward));
         // quasiBackward.whileTrue(armSub.sysQuasistatic(Direction.kReverse));
+        armPosUp.onTrue(new ArmMagic(armSub, 20));
+        armPosDown.onTrue(new ArmMagic(armSub, -20));
+
 
 
         ledTestButton.onTrue(new RunCommand(() -> ledSub.TestLED(), ledSub));
