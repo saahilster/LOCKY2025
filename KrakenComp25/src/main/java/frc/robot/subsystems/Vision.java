@@ -84,6 +84,8 @@ public class Vision extends SubsystemBase {
     visionEst.ifPresent(est -> {
       driveTrain.addVisionMeasurement(est.estimatedPose.toPose2d(), est.timestampSeconds);
       _pose = est.estimatedPose.toPose2d();
+      double timestamp = est.timestampSeconds;
+      driveTrain.addVisionMeasurement(_pose, timestamp);
     });
   }
 
