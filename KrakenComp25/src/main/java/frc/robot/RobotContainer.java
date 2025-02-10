@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
@@ -86,12 +87,14 @@ public class RobotContainer {
     private final JoystickButton elevUp = new JoystickButton(operator, ControllerConstants.b_R2);
     private final JoystickButton elevDown = new JoystickButton(operator, ControllerConstants.b_L2);
     private final POVButton armPosUp = new POVButton(operator, 0);
-    private final POVButton armPosDown = new POVButton(operator, 180);
+    private final POVButton coralHeightPOV = new POVButton(operator, 180);
     private final POVButton armPosNeutral = new POVButton(operator, 270);
+    private final POVButton armPosDown = new POVButton(operator, 90);
     private final JoystickButton cascade1 = new JoystickButton(operator, ControllerConstants.b_X);
     private final JoystickButton resetButton = new JoystickButton(operator, ControllerConstants.b_O);
     private final JoystickButton cascadeHome = new JoystickButton(operator, ControllerConstants.b_SQR);
     private final JoystickButton cascadeHigh = new JoystickButton(operator, ControllerConstants.b_TRI);
+    private final JoystickButton intakeSequence = new JoystickButton(operator, ControllerConstants.b_L1);
 
     
 
@@ -157,14 +160,24 @@ public class RobotContainer {
         // quasiForward.whileTrue(elevatorSub.sysQuasistatic(Direction.kForward));
         // quasiBackward.whileTrue(elevatorSub.sysQuasistatic(Direction.kReverse));
 
-        armPosUp.onTrue(new ArmMagic(armSub, 0));
-        armPosDown.onTrue(new ArmMagic(armSub, -180));
-        armPosNeutral.onTrue(new ArmMagic(armSub, -90));
+        armPosUp.whileTrue(new ArmMagic(armSub, 0));
+        coralHeightPOV.whileTrue(new CascadeMagic(elevatorSub, 15.5894));
+        armPosNeutral.whileTrue(new ArmMagic(armSub, -90));
+        armPosDown.whileTrue(new ArmMagic(armSub, -180));
 
         cascade1.whileTrue(new CascadeMagic(elevatorSub, 10));
         resetButton.onTrue(new InstantCommand(()-> elevatorSub.ResetPosition(), elevatorSub));
         cascadeHome.whileTrue(new CascadeMagic(elevatorSub, 0));
         cascadeHigh.whileTrue(new CascadeMagic(elevatorSub, 57.1));
+        intakeSequence.whileTrue(
+            new SequentialCommandGroup(
+                new CascadeMagic(elevatorSub, 45.4).withTimeout(1),
+                new ArmMagic(armSub, -180).withTimeout(0.85),
+                new CascadeMagic(elevatorSub, 35.02).withTimeout(1),
+                new CascadeMagic(elevatorSub, 45.4).withTimeout(0.9),
+                new ArmMagic(armSub, -30)
+            )
+        );
 
 
         ledTestButton.onTrue(new RunCommand(() -> ledSub.TestLED(), ledSub));

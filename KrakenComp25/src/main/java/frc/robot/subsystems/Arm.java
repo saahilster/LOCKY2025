@@ -86,8 +86,8 @@ public class Arm extends SubsystemBase {
     armConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = -190;
 
     var armMM = armConfig.MotionMagic;
-    armMM.withMotionMagicCruiseVelocity(0.1).
-    withMotionMagicAcceleration(0.1).
+    armMM.withMotionMagicCruiseVelocity(0.9).
+    withMotionMagicAcceleration(2.5).
     withMotionMagicJerk(0);
     // armMotor.getConfigurator().apply(slot0Config);
     armMotor.getConfigurator().apply(armConfig);
