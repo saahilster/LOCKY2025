@@ -19,18 +19,14 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.Constants.MotorConstants;
-
 import static edu.wpi.first.units.Units.*;
-
 import java.util.function.DoubleSupplier;
-
 import javax.print.attribute.standard.MediaSize.Other;
 
-//TODO: remove all pivot code after wrist code is implemented
 public class Intake extends SubsystemBase {
   /** Creates a new Intake. */
-  private final TalonFX intakeMotor = new TalonFX(MotorConstants.algaeIntakeID, "Other");
-  private final TalonFX pivotMotor = new TalonFX(21, "Other");
+  private final TalonFX intakeMotor = new TalonFX(21, "Other");
+  private final TalonFX pivotMotor = new TalonFX(16, "Other");
   private LED ledSUb = LED.getInstance();
 
   public Intake() {

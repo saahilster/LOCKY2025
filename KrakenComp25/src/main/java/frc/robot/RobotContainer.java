@@ -30,6 +30,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.Constants.ControllerConstants;
 import frc.robot.commands.AlgaeIntake;
 import frc.robot.commands.ArmMagic;
+import frc.robot.commands.CascadeMagic;
 import frc.robot.commands.CascadeMove;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.Arm;
@@ -86,6 +87,13 @@ public class RobotContainer {
     private final JoystickButton elevDown = new JoystickButton(operator, ControllerConstants.b_L2);
     private final POVButton armPosUp = new POVButton(operator, 0);
     private final POVButton armPosDown = new POVButton(operator, 180);
+    private final POVButton armPosNeutral = new POVButton(operator, 270);
+    private final JoystickButton cascade1 = new JoystickButton(operator, ControllerConstants.b_X);
+    private final JoystickButton resetButton = new JoystickButton(operator, ControllerConstants.b_O);
+    private final JoystickButton cascadeHome = new JoystickButton(operator, ControllerConstants.b_SQR);
+    private final JoystickButton cascadeHigh = new JoystickButton(operator, ControllerConstants.b_TRI);
+
+    
 
 
     // SysID tuning will be on operator controller
@@ -144,19 +152,25 @@ public class RobotContainer {
         // OPERATOR BINDINGS
         // For SysID
 
-        // dyanamicForward.whileTrue(armSub.sysDynamic(Direction.kForward));
-        // dyanamicBackward.whileTrue(armSub.sysDynamic(Direction.kReverse));
-        // quasiForward.whileTrue(armSub.sysQuasistatic(Direction.kForward));
-        // quasiBackward.whileTrue(armSub.sysQuasistatic(Direction.kReverse));
-        armPosUp.onTrue(new ArmMagic(armSub, 20));
-        armPosDown.onTrue(new ArmMagic(armSub, -20));
+        // dyanamicForward.whileTrue(elevatorSub.sysDynamic(Direction.kForward));
+        // dyanamicBackward.whileTrue(elevatorSub.sysDynamic(Direction.kReverse));
+        // quasiForward.whileTrue(elevatorSub.sysQuasistatic(Direction.kForward));
+        // quasiBackward.whileTrue(elevatorSub.sysQuasistatic(Direction.kReverse));
 
+        armPosUp.onTrue(new ArmMagic(armSub, 0));
+        armPosDown.onTrue(new ArmMagic(armSub, -180));
+        armPosNeutral.onTrue(new ArmMagic(armSub, -90));
+
+        cascade1.whileTrue(new CascadeMagic(elevatorSub, 10));
+        resetButton.onTrue(new InstantCommand(()-> elevatorSub.ResetPosition(), elevatorSub));
+        cascadeHome.whileTrue(new CascadeMagic(elevatorSub, 0));
+        cascadeHigh.whileTrue(new CascadeMagic(elevatorSub, 57.1));
 
 
         ledTestButton.onTrue(new RunCommand(() -> ledSub.TestLED(), ledSub));
 
         intakeSub.setDefaultCommand(new RunCommand(()-> intakeSub.MovePivot(operator.getLeftX() * 0.1), intakeSub));
-        elevatorSub.setDefaultCommand(new RunCommand(()-> elevatorSub.ManualMove(operator.getLeftY() * 0.9), elevatorSub));
+        elevatorSub.setDefaultCommand(new RunCommand(()-> elevatorSub.ManualMove(-operator.getLeftY() * 0.9), elevatorSub));
         armSub.setDefaultCommand(new RunCommand(()-> armSub.ManualMove(-operator.getRightY() * 0.5), armSub));
 
         // armUp.whileTrue(new ArmMove(armSub, 0.1));

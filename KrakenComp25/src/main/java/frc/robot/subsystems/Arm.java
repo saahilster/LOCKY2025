@@ -14,6 +14,7 @@ import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -27,6 +28,8 @@ public class Arm extends SubsystemBase {
   double gearRatio = 100;
   private VoltageOut vOut = new VoltageOut(0);
   private static Arm instance;
+  MotionMagicVoltage request = new MotionMagicVoltage(0);
+
 
   public static Arm getInstance(){
     if(instance == null){
@@ -56,6 +59,7 @@ public class Arm extends SubsystemBase {
   public Arm() {
     Config();
     SignalLogger.start();
+    
   }
 
   public void ManualMove(double speed){
@@ -66,17 +70,23 @@ public class Arm extends SubsystemBase {
     var armConfig = new TalonFXConfiguration();
     armConfig.Feedback.SensorToMechanismRatio = gearRatio;
     armConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+    armMotor.setNeutralMode(NeutralModeValue.Brake);
     var slot0Config = armConfig.Slot0;
     slot0Config.kS = 0.18405;
     slot0Config.kV = 9.5916;
     slot0Config.kA = 0.97255;
-    slot0Config.kG = 38.404;
+    // slot0Config.kG = 38.404;
     slot0Config.kP = 58.161;
     slot0Config.kI = 0;
     slot0Config.kD = 13.754;
 
+    armConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
+    armConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = 5;
+    armConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
+    armConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = -190;
+
     var armMM = armConfig.MotionMagic;
-    armMM.withMotionMagicCruiseVelocity(01.).
+    armMM.withMotionMagicCruiseVelocity(0.1).
     withMotionMagicAcceleration(0.1).
     withMotionMagicJerk(0);
     // armMotor.getConfigurator().apply(slot0Config);
@@ -88,10 +98,8 @@ public class Arm extends SubsystemBase {
   }
 
   public void MagicMove(double degrees){
-    MotionMagicVoltage request = new MotionMagicVoltage(Units.degreesToRotations(degrees));
-    armMotor.setControl(request);
+      armMotor.setControl(request.withPosition(Units.degreesToRotations(degrees)));
   }
-
 
 
   @Override

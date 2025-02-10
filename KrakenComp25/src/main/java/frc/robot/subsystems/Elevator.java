@@ -4,20 +4,26 @@
 
 package frc.robot.subsystems;
 
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
 import com.ctre.phoenix.Util;
 import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.Utils;
+import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.GravityTypeValue;
+import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.sim.ChassisReference;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
@@ -37,13 +43,19 @@ public class Elevator extends SubsystemBase {
   private final TalonFX rightMotor = new TalonFX(MotorConstants.rightCascadeID, "Other");
   Follower follower = new Follower(MotorConstants.leftCascadeID, true);
 
-  private final TalonFX armMotor = new TalonFX(MotorConstants.wristMotorID, "Other");
   private static Elevator instance;
 
   private VoltageOut vOut = new VoltageOut(0);
-  private static final double elevatorGearRatio = 100;
-  private static final double spoolDiameter = 0;
-  private static final double maxHeight = 0;
+  private static final double elevatorGearRatio = 54;
+  private static final double spoolDiameter = 1.625;
+  private static final double maxHeight = 64.75;
+  private static final double minHeight = 39.5;
+
+  private static final double spoolCircumference = spoolDiameter * Math.PI;
+  //2 accounts for the stages of the cascade 
+  //gear ratio not accounted for beacause sensorToMechanismRatio is used
+  private static final double heightPerRotation = spoolCircumference * 2;
+  private MotionMagicVoltage request = new MotionMagicVoltage(0);
 
   private LED ledSub = LED.getInstance();
 
@@ -57,22 +69,9 @@ public class Elevator extends SubsystemBase {
   //TODO: CHANGE VALUES FOR LOWER SPEEDS
   private final SysIdRoutine elevatorRoutine = new SysIdRoutine(
       new SysIdRoutine.Config(
-          null,
-          Volts.of(2),
-          Seconds.of(3),
-          state -> SignalLogger.writeString("state", state.toString())),
-      new SysIdRoutine.Mechanism(
-          volts -> leftMotor.setControl(vOut.withOutput(volts.in(Volts))),
-          null,
-          this));
-
-  //TODO: CHANGE VALUES
-  //ARM SYSID ROUTINE
-  private final SysIdRoutine armRoutine = new SysIdRoutine(
-      new SysIdRoutine.Config(
-          null,
-          Volts.of(3),
-          Seconds.of(3),
+          Volts.per(Seconds).of(0.75),
+          Volts.of(1.5),
+          Seconds.of(4),
           state -> SignalLogger.writeString("state", state.toString())),
       new SysIdRoutine.Mechanism(
           volts -> leftMotor.setControl(vOut.withOutput(volts.in(Volts))),
@@ -96,58 +95,58 @@ public class Elevator extends SubsystemBase {
   private void BrakeMode() {
     leftMotor.setNeutralMode(NeutralModeValue.Brake);
     rightMotor.setNeutralMode(NeutralModeValue.Brake);
-    armMotor.setNeutralMode(NeutralModeValue.Brake);
   }
 
   public void ManualMove(double speed) {
     leftMotor.set(speed);
   }
 
-  public void MagicMove(double feet) {
-    MotionMagicVoltage request = new MotionMagicVoltage(0);
-    leftMotor.setControl(request);
-  }
-
   private void CascadeConfig() {
     var cascadeConfig = new TalonFXConfiguration();
     cascadeConfig.Feedback.SensorToMechanismRatio = elevatorGearRatio;
+    cascadeConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+
     var slot0Config = cascadeConfig.Slot0;
-    slot0Config.kS = 0;
-    slot0Config.kV = 0;
-    slot0Config.kA = 0;
-    slot0Config.kP = 0;
+    slot0Config.GravityType = GravityTypeValue.Elevator_Static;
+    slot0Config.kS = 0.062304;
+    slot0Config.kV = 6.0618;
+    slot0Config.kA = 0.0011081;
+    slot0Config.kG = 0.041429;
+    slot0Config.kP = 66.977;
     slot0Config.kI = 0;
-    slot0Config.kD = 0;
+    slot0Config.kD = 9.2718;
+
+    // cascadeConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
+    // cascadeConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = maxHeight;
+    // cascadeConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
+    // cascadeConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = minHeight;
 
     var elevateMM = cascadeConfig.MotionMagic;
-    elevateMM.MotionMagicCruiseVelocity = 0;
-    elevateMM.MotionMagicAcceleration = 0;
+    elevateMM.MotionMagicCruiseVelocity = 0.3;
+    elevateMM.MotionMagicAcceleration = 0.3;
     elevateMM.MotionMagicJerk = 0;
-    leftMotor.getConfigurator().apply(slot0Config);
-    rightMotor.getConfigurator().apply(slot0Config);
+    leftMotor.getConfigurator().apply(cascadeConfig);
   }
 
-  public void ArmManual(double speed){
-    armMotor.set(speed);
+  public double GetHeight(){
+    return leftMotor.getPosition().getValueAsDouble() * heightPerRotation;
   }
 
-  public void ArmMagic(double degrees){
-    MotionMagicVoltage request = new MotionMagicVoltage(Units.degreesToRotations(degrees));
-    armMotor.setControl(request);
+  public void SetHeight(double inches){
+    double rotations = inches / heightPerRotation;
+    leftMotor.setControl(request.withPosition(rotations));
   }
 
-  // TODO: Set limits
-  public boolean ElevatorLimits() {
-    return false;
+  public void ResetPosition(){
+    leftMotor.setPosition(0);
+    rightMotor.setPosition(0);
   }
 
-  public boolean ArmLimits(){
-    return false;
-  }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    System.out.println(GetHeight());
   }
 
 }
