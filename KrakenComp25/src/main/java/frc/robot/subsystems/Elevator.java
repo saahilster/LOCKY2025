@@ -72,7 +72,7 @@ public class Elevator extends SubsystemBase {
           Volts.per(Seconds).of(0.75),
           Volts.of(1.5),
           Seconds.of(4),
-          state -> SignalLogger.writeString("state", state.toString())),
+          state -> SignalLogger.writeString("elevator state", state.toString())),
       new SysIdRoutine.Mechanism(
           volts -> leftMotor.setControl(vOut.withOutput(volts.in(Volts))),
           null,
@@ -116,10 +116,10 @@ public class Elevator extends SubsystemBase {
     slot0Config.kI = 0;
     slot0Config.kD = 9.2718;
 
-    // cascadeConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
-    // cascadeConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = maxHeight;
-    // cascadeConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
-    // cascadeConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = minHeight;
+    cascadeConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
+    cascadeConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = 57.5;
+    cascadeConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
+    cascadeConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = -0.1;
 
     var elevateMM = cascadeConfig.MotionMagic;
     elevateMM.MotionMagicCruiseVelocity = 0.3;
@@ -146,7 +146,7 @@ public class Elevator extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    System.out.println(GetHeight());
+    // System.out.println(GetHeight());
   }
 
 }

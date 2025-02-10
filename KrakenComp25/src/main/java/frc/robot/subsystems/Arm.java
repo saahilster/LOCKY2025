@@ -38,7 +38,7 @@ public class Arm extends SubsystemBase {
     return instance;
   }
 
-  private final SysIdRoutine armRoutine = new SysIdRoutine(
+  private final SysIdRoutine pivotRoutine = new SysIdRoutine(
       new SysIdRoutine.Config(
           Volts.per(Seconds).of(0.35),
           Volts.of(0.65),
@@ -50,10 +50,10 @@ public class Arm extends SubsystemBase {
           this));
 
   public Command sysDynamic(SysIdRoutine.Direction direction){
-      return armRoutine.dynamic(direction);
+      return pivotRoutine.dynamic(direction);
     }
     public Command sysQuasistatic(SysIdRoutine.Direction direction){
-      return armRoutine.quasistatic(direction);
+      return pivotRoutine.quasistatic(direction);
     }
 
   public Arm() {

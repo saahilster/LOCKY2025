@@ -152,19 +152,19 @@ public class RobotContainer {
         // OPERATOR BINDINGS
         // For SysID
 
-        // dyanamicForward.whileTrue(elevatorSub.sysDynamic(Direction.kForward));
-        // dyanamicBackward.whileTrue(elevatorSub.sysDynamic(Direction.kReverse));
-        // quasiForward.whileTrue(elevatorSub.sysQuasistatic(Direction.kForward));
-        // quasiBackward.whileTrue(elevatorSub.sysQuasistatic(Direction.kReverse));
+        dyanamicForward.whileTrue(intakeSub.sysDynamic(Direction.kForward));
+        dyanamicBackward.whileTrue(intakeSub.sysDynamic(Direction.kReverse));
+        quasiForward.whileTrue(intakeSub.sysQuasistatic(Direction.kForward));
+        quasiBackward.whileTrue(intakeSub.sysQuasistatic(Direction.kReverse));
 
         armPosUp.onTrue(new ArmMagic(armSub, 0));
         armPosDown.onTrue(new ArmMagic(armSub, -180));
         armPosNeutral.onTrue(new ArmMagic(armSub, -90));
 
-        cascade1.whileTrue(new CascadeMagic(elevatorSub, 10));
-        resetButton.onTrue(new InstantCommand(()-> elevatorSub.ResetPosition(), elevatorSub));
-        cascadeHome.whileTrue(new CascadeMagic(elevatorSub, 0));
-        cascadeHigh.whileTrue(new CascadeMagic(elevatorSub, 57.1));
+        // cascade1.whileTrue(new CascadeMagic(elevatorSub, 10));
+        // resetButton.onTrue(new InstantCommand(()-> elevatorSub.ResetPosition(), elevatorSub));
+        // cascadeHome.whileTrue(new CascadeMagic(elevatorSub, 0));
+        // cascadeHigh.whileTrue(new CascadeMagic(elevatorSub, 57.1));
 
 
         ledTestButton.onTrue(new RunCommand(() -> ledSub.TestLED(), ledSub));
