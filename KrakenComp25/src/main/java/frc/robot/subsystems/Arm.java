@@ -52,7 +52,7 @@ public class Arm extends SubsystemBase {
   public Command sysDynamic(SysIdRoutine.Direction direction){
       return armRoutine.dynamic(direction);
     }
-    public Command sysQuasistatic(SysIdRoutine.Direction direction){
+    public Command sysQuasistatic(SysIdRoutine.Direction direction){  
       return armRoutine.quasistatic(direction);
     }
 
