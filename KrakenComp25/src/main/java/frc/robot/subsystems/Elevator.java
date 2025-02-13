@@ -42,7 +42,7 @@ public class Elevator extends SubsystemBase {
   private final TalonFX leftMotor = new TalonFX(MotorConstants.leftCascadeID, "Other");
   private final TalonFX rightMotor = new TalonFX(15, "Other");
 
-  private Follower follow = new Follower(15, true);
+  private Follower follow = new Follower(14, true);
   private static Elevator instance;
 
   private VoltageOut vOut = new VoltageOut(0);
@@ -87,8 +87,8 @@ public class Elevator extends SubsystemBase {
 
   public Elevator() {
     BrakeMode();
-    // CascadeConfig();
-    // leftMotor.setControl(follow);
+    CascadeConfig();
+    rightMotor.setControl(follow);
     SignalLogger.start();
   }
 
@@ -128,20 +128,20 @@ public class Elevator extends SubsystemBase {
     elevateMM.MotionMagicCruiseVelocity = 0.3;
     elevateMM.MotionMagicAcceleration = 0.3;
     elevateMM.MotionMagicJerk = 0;
-    rightMotor.getConfigurator().apply(cascadeConfig);
+    leftMotor.getConfigurator().apply(cascadeConfig);
   }
 
   public double GetHeight(){
-    return rightMotor.getPosition().getValueAsDouble() * heightPerRotation;
+    return leftMotor.getPosition().getValueAsDouble() * heightPerRotation;
   }
 
   public void SetHeight(double inches){
     double rotations = inches / heightPerRotation;
-    rightMotor.setControl(request.withPosition(rotations));
+    leftMotor.setControl(request.withPosition(rotations));
   }
 
   public void ResetPosition(){
-    rightMotor.setPosition(0);
+    leftMotor.setPosition(0);
     rightMotor.setPosition(0);
   }
 
