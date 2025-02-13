@@ -97,10 +97,6 @@ public class Elevator extends SubsystemBase {
   }
 
   public void ManualMove(double speed) {
-    rightMotor.set(speed);
-  }
-
-  public void LeftMove(double speed){
     leftMotor.set(speed);
   }
 
@@ -149,7 +145,7 @@ public class Elevator extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    // System.out.println(GetHeight());
+    System.out.println(GetHeight());
   }
 
 }
