@@ -32,6 +32,7 @@ import frc.robot.commands.AlgaeIntake;
 import frc.robot.commands.ArmMagic;
 import frc.robot.commands.CascadeMagic;
 import frc.robot.commands.CascadeMove;
+import frc.robot.commands.LeftCascadeCMD;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Climb;
@@ -51,7 +52,7 @@ public class RobotContainer {
     public Intake intakeSub = new Intake();
     // private static Vision visionSub = Vision.getInstance(); 
     private Arm armSub = Arm.getInstance();
-    // private Climb climbSub = Climb.getInstance();
+    private Climb climbSub = Climb.getInstance();
 
     public double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
     public double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max
@@ -152,14 +153,14 @@ public class RobotContainer {
         // OPERATOR BINDINGS
         // For SysID
 
-        dyanamicForward.whileTrue(intakeSub.sysDynamic(Direction.kForward));
-        dyanamicBackward.whileTrue(intakeSub.sysDynamic(Direction.kReverse));
-        quasiForward.whileTrue(intakeSub.sysQuasistatic(Direction.kForward));
-        quasiBackward.whileTrue(intakeSub.sysQuasistatic(Direction.kReverse));
+        // dyanamicForward.whileTrue(intakeSub.sysDynamic(Direction.kForward));
+        // dyanamicBackward.whileTrue(intakeSub.sysDynamic(Direction.kReverse));
+        // quasiForward.whileTrue(intakeSub.sysQuasistatic(Direction.kForward));
+        // quasiBackward.whileTrue(intakeSub.sysQuasistatic(Direction.kReverse));
 
-        armPosUp.onTrue(new ArmMagic(armSub, 0));
-        armPosDown.onTrue(new ArmMagic(armSub, -180));
-        armPosNeutral.onTrue(new ArmMagic(armSub, -90));
+        // armPosUp.onTrue(new ArmMagic(armSub, 0));
+        // armPosDown.onTrue(new ArmMagic(armSub, -180));
+        // armPosNeutral.onTrue(new ArmMagic(armSub, -90));
 
         // cascade1.whileTrue(new CascadeMagic(elevatorSub, 10));
         // resetButton.onTrue(new InstantCommand(()-> elevatorSub.ResetPosition(), elevatorSub));
@@ -170,8 +171,15 @@ public class RobotContainer {
         ledTestButton.onTrue(new RunCommand(() -> ledSub.TestLED(), ledSub));
 
         intakeSub.setDefaultCommand(new RunCommand(()-> intakeSub.MovePivot(operator.getLeftX() * 0.1), intakeSub));
-        elevatorSub.setDefaultCommand(new RunCommand(()-> elevatorSub.ManualMove(-operator.getLeftY() * 0.9), elevatorSub));
-        armSub.setDefaultCommand(new RunCommand(()-> armSub.ManualMove(-operator.getRightY() * 0.5), armSub));
+        // elevatorSub.setDefaultCommand(new RunCommand(()-> elevatorSub.ManualMove(-operator.getLeftY() * 0.2), elevatorSub));
+
+        armDown.whileTrue(new CascadeMove(0.2, elevatorSub));
+        elevDown.whileTrue(new CascadeMove(-0.2, elevatorSub));
+
+
+        elevatorSub.setDefaultCommand(new RunCommand(()-> elevatorSub.ManualMove(-operator.getRightY()* 0.2), elevatorSub));
+        // armSub.setDefaultCommand(new RunCommand(()-> armSub.ManualMove(-operator.getRightY() * 0.5), armSub));
+        climbSub.setDefaultCommand(new RunCommand(()-> climbSub.Move(operator.getLeftX()), climbSub));
 
         // armUp.whileTrue(new ArmMove(armSub, 0.1));
         // armDown.whileTrue(new ArmMove(armSub, -0.1));

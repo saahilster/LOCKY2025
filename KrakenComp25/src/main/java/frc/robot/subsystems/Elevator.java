@@ -40,9 +40,9 @@ import frc.Constants.MotorConstants;
 public class Elevator extends SubsystemBase {
   /** Creates a new Elevator. */
   private final TalonFX leftMotor = new TalonFX(MotorConstants.leftCascadeID, "Other");
-  private final TalonFX rightMotor = new TalonFX(MotorConstants.rightCascadeID, "Other");
-  Follower follower = new Follower(MotorConstants.leftCascadeID, true);
+  private final TalonFX rightMotor = new TalonFX(15, "Other");
 
+  private Follower follow = new Follower(15, true);
   private static Elevator instance;
 
   private VoltageOut vOut = new VoltageOut(0);
@@ -74,7 +74,7 @@ public class Elevator extends SubsystemBase {
           Seconds.of(4),
           state -> SignalLogger.writeString("elevator state", state.toString())),
       new SysIdRoutine.Mechanism(
-          volts -> leftMotor.setControl(vOut.withOutput(volts.in(Volts))),
+          volts -> rightMotor.setControl(vOut.withOutput(volts.in(Volts))),
           null,
           this));
 
@@ -87,17 +87,20 @@ public class Elevator extends SubsystemBase {
 
   public Elevator() {
     BrakeMode();
-    rightMotor.setControl(follower);
-    CascadeConfig();
+    // CascadeConfig();
+    // leftMotor.setControl(follow);
     SignalLogger.start();
   }
 
   private void BrakeMode() {
-    leftMotor.setNeutralMode(NeutralModeValue.Brake);
     rightMotor.setNeutralMode(NeutralModeValue.Brake);
   }
 
   public void ManualMove(double speed) {
+    rightMotor.set(speed);
+  }
+
+  public void LeftMove(double speed){
     leftMotor.set(speed);
   }
 
@@ -125,20 +128,20 @@ public class Elevator extends SubsystemBase {
     elevateMM.MotionMagicCruiseVelocity = 0.3;
     elevateMM.MotionMagicAcceleration = 0.3;
     elevateMM.MotionMagicJerk = 0;
-    leftMotor.getConfigurator().apply(cascadeConfig);
+    rightMotor.getConfigurator().apply(cascadeConfig);
   }
 
   public double GetHeight(){
-    return leftMotor.getPosition().getValueAsDouble() * heightPerRotation;
+    return rightMotor.getPosition().getValueAsDouble() * heightPerRotation;
   }
 
   public void SetHeight(double inches){
     double rotations = inches / heightPerRotation;
-    leftMotor.setControl(request.withPosition(rotations));
+    rightMotor.setControl(request.withPosition(rotations));
   }
 
   public void ResetPosition(){
-    leftMotor.setPosition(0);
+    rightMotor.setPosition(0);
     rightMotor.setPosition(0);
   }
 
