@@ -17,6 +17,7 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
@@ -81,13 +82,13 @@ public class Arm extends SubsystemBase {
     slot0Config.kD = 13.754;
 
     armConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
-    armConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = 5;
+    armConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = 0;
     armConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
     armConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = -190;
 
     var armMM = armConfig.MotionMagic;
-    armMM.withMotionMagicCruiseVelocity(0.1).
-    withMotionMagicAcceleration(0.1).
+    armMM.withMotionMagicCruiseVelocity(0.9).
+    withMotionMagicAcceleration(2.4).
     withMotionMagicJerk(0);
     // armMotor.getConfigurator().apply(slot0Config);
     armMotor.getConfigurator().apply(armConfig);
@@ -105,6 +106,6 @@ public class Arm extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    // System.out.println(GetAngle());
+    SmartDashboard.putNumber("Arm Angle", GetAngle());
   }
 }

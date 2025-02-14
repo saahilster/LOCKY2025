@@ -32,6 +32,7 @@ import edu.wpi.first.units.Unit;
 import edu.wpi.first.wpilibj.motorcontrol.Talon;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
@@ -57,7 +58,7 @@ public class Elevator extends SubsystemBase {
   private static final double heightPerRotation = spoolCircumference * 2;
   private MotionMagicVoltage request = new MotionMagicVoltage(0);
 
-  private LED ledSub = LED.getInstance();
+  // private LED ledSub = LED.getInstance();
 
   public static Elevator getInstance(){
     if(instance == null){
@@ -116,13 +117,13 @@ public class Elevator extends SubsystemBase {
     slot0Config.kD = 9.2718;
 
     cascadeConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
-    cascadeConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = 57.5;
+    cascadeConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = 57;
     cascadeConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
-    cascadeConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = -0.1;
+    cascadeConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = 0;
 
     var elevateMM = cascadeConfig.MotionMagic;
-    elevateMM.MotionMagicCruiseVelocity = 0.3;
-    elevateMM.MotionMagicAcceleration = 0.3;
+    elevateMM.MotionMagicCruiseVelocity = 1.72;
+    elevateMM.MotionMagicAcceleration = 5;
     elevateMM.MotionMagicJerk = 0;
     leftMotor.getConfigurator().apply(cascadeConfig);
   }
@@ -145,7 +146,8 @@ public class Elevator extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    System.out.println(GetHeight());
+    SmartDashboard.putNumber("Elevator Position", GetHeight());
+    // System.out.println(GetHeight());
   }
 
 }

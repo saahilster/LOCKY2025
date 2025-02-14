@@ -26,7 +26,7 @@ public class Intake extends SubsystemBase {
   /** Creates a new Intake. */
   private final TalonFX intakeMotor = new TalonFX(21, "Other");
   private final TalonFX pivotMotor = new TalonFX(16, "Other");
-  private LED ledSUb = LED.getInstance();
+  // private LED ledSUb = LED.getInstance();
   private VoltageOut vOut = new VoltageOut(0);
   private double gearRatio = 25;
 
@@ -83,7 +83,7 @@ public class Intake extends SubsystemBase {
 
   public void MoveIntake(double speed){
     intakeMotor.set(speed);
-    ledSUb.Intaking();
+    // ledSUb.Intaking();
   }
 
   public void MovePivot(double speed){
