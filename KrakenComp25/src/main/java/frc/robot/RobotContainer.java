@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -93,9 +94,11 @@ public class RobotContainer {
     private final JoystickButton cascade1 = new JoystickButton(operator, ControllerConstants.b_X);
     private final JoystickButton resetButton = new JoystickButton(operator, ControllerConstants.b_O);
     private final JoystickButton cascadeHome = new JoystickButton(operator, ControllerConstants.b_SQR);
+
     private final JoystickButton cascadeHigh = new JoystickButton(operator, ControllerConstants.b_TRI);
     private final JoystickButton intakeSequence = new JoystickButton(operator, ControllerConstants.b_L1);
-
+    private final JoystickButton L3Button = new JoystickButton(operator, ControllerConstants.b_R1);
+    private final JoystickButton L2Button = new JoystickButton(operator, ControllerConstants.b_R2);
 
     
 
@@ -136,7 +139,7 @@ public class RobotContainer {
                 ));
 
         
-        slowButton.whileTrue(drivetrain.applyRequest(() -> drive.withVelocityX(-driver.getLeftY() * 1.5) // Drive
+        slowButton.whileTrue(drivetrain.applyRequest(() -> drive.withVelocityX(-driver.getLeftY() * 1) // Drive
                                                                                                          // forward with
                                                                                                          // negative Y
                                                                                                          // (forward)
@@ -156,43 +159,46 @@ public class RobotContainer {
         // OPERATOR BINDINGS
         // For SysID
 
-        // dyanamicForward.whileTrue(intakeSub.sysDynamic(Direction.kForward));
-        // dyanamicBackward.whileTrue(intakeSub.sysDynamic(Direction.kReverse));
-        // quasiForward.whileTrue(intakeSub.sysQuasistatic(Direction.kForward));
-        // quasiBackward.whileTrue(intakeSub.sysQuasistatic(Direction.kReverse));
+        // dyanamicForward.whileTrue(elevatorSub.sysDynamic(Direction.kForward));
+        // dyanamicBackward.whileTrue(elevatorSub.sysDynamic(Direction.kReverse));
+        // quasiForward.whileTrue(elevatorSub.sysQuasistatic(Direction.kForward));
+        // quasiBackward.whileTrue(elevatorSub.sysQuasistatic(Direction.kReverse));
 
         armPosUp.whileTrue(new ArmMagic(armSub, 0));
-        armPosDown.whileTrue(new ArmMagic(armSub, -180));
+        coralHeightPOV.whileTrue(new CascadeMagic(elevatorSub, 18.96));
         armPosNeutral.whileTrue(new ArmMagic(armSub, -90));
+        armPosDown.whileTrue(new ArmMagic(armSub, -180));
 
         cascade1.whileTrue(new CascadeMagic(elevatorSub, 10));
         resetButton.onTrue(new InstantCommand(()-> elevatorSub.ResetPosition(), elevatorSub));
         cascadeHome.whileTrue(new CascadeMagic(elevatorSub, 0));
-        cascadeHigh.whileTrue(new CascadeMagic(elevatorSub, 57.1));
-
-        coralHeightPOV.whileTrue(new CascadeMagic(elevatorSub, 15.5894));
-
         intakeSequence.whileTrue(
             new SequentialCommandGroup(
-                new RunCommand(()-> elevatorSub.SetHeight(45.4), elevatorSub).withTimeout(1),
+                new CascadeMagic(elevatorSub, 55.18131563981472).withTimeout(1),
                 new ArmMagic(armSub, -180).withTimeout(0.85),
-                new RunCommand(()-> elevatorSub.SetHeight(35.02), elevatorSub).withTimeout(1),
-                new RunCommand(()-> elevatorSub.SetHeight(45.4), elevatorSub).withTimeout(1),
-                new ArmMagic(armSub, -30)
+                new CascadeMagic(elevatorSub, 39.87602232868573).withTimeout(1),
+                new CascadeMagic(elevatorSub, 55.18131563981472).withTimeout(0.9)
+            )
+        );
+
+        cascadeHigh.whileTrue(
+            new ParallelCommandGroup(
+                new CascadeMagic(elevatorSub, 67.66734401040839),
+                new ArmMagic(armSub, -40.60546875)
             ));
+        L3Button.whileTrue(
+            new ParallelCommandGroup(
+                new CascadeMagic(elevatorSub, 27.464),
+                new ArmMagic(armSub, -26.0156)
+            ));
+
 
         // ledTestButton.onTrue(new RunCommand(() -> ledSub.TestLED(), ledSub));
 
         intakeSub.setDefaultCommand(new RunCommand(()-> intakeSub.MovePivot(operator.getLeftX() * 0.1), intakeSub));
-
-        armDown.whileTrue(new CascadeMove(0.2, elevatorSub));
-        elevDown.whileTrue(new CascadeMove(-0.2, elevatorSub));
-
-
-        elevatorSub.setDefaultCommand(new RunCommand(()-> elevatorSub.ManualMove(-operator.getLeftY()), elevatorSub));
+        elevatorSub.setDefaultCommand(new RunCommand(()-> elevatorSub.ManualMove(-operator.getLeftY() * 0.9), elevatorSub));
         armSub.setDefaultCommand(new RunCommand(()-> armSub.ManualMove(-operator.getRightY() * 0.5), armSub));
-        intakeSub.setDefaultCommand(new RunCommand(()-> intakeSub.MovePivot(operator.getRightX() * 0.5), intakeSub));
-        // climbSub.setDefaultCommand(new RunCommand(()-> climbSub.Move(operator.getLeftX()), climbSub));
+        // climbSub.setDefaultCommand(new RunCommand(()-> climbSub.Move(operator.getRightX()), climbSub));
 
         // armUp.whileTrue(new ArmMove(armSub, 0.1));
         // armDown.whileTrue(new ArmMove(armSub, -0.1));

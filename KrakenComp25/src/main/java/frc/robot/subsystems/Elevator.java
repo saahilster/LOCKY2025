@@ -47,7 +47,7 @@ public class Elevator extends SubsystemBase {
   private static Elevator instance;
 
   private VoltageOut vOut = new VoltageOut(0);
-  private static final double elevatorGearRatio = 54;
+  private static final double elevatorGearRatio = 35.714;
   private static final double spoolDiameter = 1.625;
   private static final double maxHeight = 64.75;
   private static final double minHeight = 39.5;
@@ -70,12 +70,12 @@ public class Elevator extends SubsystemBase {
   //TODO: CHANGE VALUES FOR LOWER SPEEDS
   private final SysIdRoutine elevatorRoutine = new SysIdRoutine(
       new SysIdRoutine.Config(
-          Volts.per(Seconds).of(0.75),
-          Volts.of(1.5),
+          Volts.per(Seconds).of(1.3),
+          Volts.of(1.75),
           Seconds.of(4),
           state -> SignalLogger.writeString("elevator state", state.toString())),
       new SysIdRoutine.Mechanism(
-          volts -> rightMotor.setControl(vOut.withOutput(volts.in(Volts))),
+          volts -> leftMotor.setControl(vOut.withOutput(volts.in(Volts))),
           null,
           this));
 
@@ -94,7 +94,7 @@ public class Elevator extends SubsystemBase {
   }
 
   private void BrakeMode() {
-    rightMotor.setNeutralMode(NeutralModeValue.Brake);
+    leftMotor.setNeutralMode(NeutralModeValue.Brake);
   }
 
   public void ManualMove(double speed) {
@@ -108,21 +108,21 @@ public class Elevator extends SubsystemBase {
 
     var slot0Config = cascadeConfig.Slot0;
     slot0Config.GravityType = GravityTypeValue.Elevator_Static;
-    slot0Config.kS = 0.062304;
-    slot0Config.kV = 6.0618;
-    slot0Config.kA = 0.0011081;
-    slot0Config.kG = 0.041429;
-    slot0Config.kP = 66.977;
+    slot0Config.kS = 0.028205;
+    slot0Config.kV = 4.0857;
+    slot0Config.kA = 0.072617;
+    slot0Config.kG = 0.053742;
+    slot0Config.kP = 33.628;
     slot0Config.kI = 0;
-    slot0Config.kD = 9.2718;
+    slot0Config.kD = 1.637;
 
-    cascadeConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
-    cascadeConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = 57;
-    cascadeConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
-    cascadeConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = 0;
+    // cascadeConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
+    // cascadeConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = 57;
+    // cascadeConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
+    // cascadeConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = 0;
 
     var elevateMM = cascadeConfig.MotionMagic;
-    elevateMM.MotionMagicCruiseVelocity = 1.72;
+    elevateMM.MotionMagicCruiseVelocity = 2.57;
     elevateMM.MotionMagicAcceleration = 5;
     elevateMM.MotionMagicJerk = 0;
     leftMotor.getConfigurator().apply(cascadeConfig);
@@ -139,7 +139,6 @@ public class Elevator extends SubsystemBase {
 
   public void ResetPosition(){
     leftMotor.setPosition(0);
-    rightMotor.setPosition(0);
   }
 
 
