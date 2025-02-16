@@ -47,7 +47,7 @@ public class Elevator extends SubsystemBase {
   private static Elevator instance;
 
   private VoltageOut vOut = new VoltageOut(0);
-  private static final double elevatorGearRatio = 35.714;
+  private static final double elevatorGearRatio = 12;
   private static final double spoolDiameter = 1.625;
   private static final double maxHeight = 64.75;
   private static final double minHeight = 39.5;
