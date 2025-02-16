@@ -42,12 +42,12 @@ public class Elevator extends SubsystemBase {
   /** Creates a new Elevator. */
   private final TalonFX leftMotor = new TalonFX(MotorConstants.leftCascadeID, "Other");
   private final TalonFX rightMotor = new TalonFX(15, "Other");
-
+  
   private Follower follow = new Follower(14, true);
   private static Elevator instance;
 
   private VoltageOut vOut = new VoltageOut(0);
-  private static final double elevatorGearRatio = 35.714;
+  private static final double elevatorGearRatio = 12;
   private static final double spoolDiameter = 1.625;
   private static final double maxHeight = 64.75;
   private static final double minHeight = 39.5;

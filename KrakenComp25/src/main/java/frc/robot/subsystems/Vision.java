@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems;
 
+import java.io.File;
 import java.lang.constant.DirectMethodHandleDesc.Kind;
 import java.util.Optional;
 
@@ -12,6 +13,10 @@ import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonUtils;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
+import org.photonvision.estimation.TargetModel;
+import org.photonvision.simulation.PhotonCameraSim;
+import org.photonvision.simulation.SimCameraProperties;
+import org.photonvision.simulation.VisionSystemSim;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.littletonrobotics.junction.Logger;
 import com.ctre.phoenix6.Utils;
@@ -28,6 +33,8 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -36,18 +43,24 @@ import frc.robot.generated.TunerConstants;
 
 public class Vision extends SubsystemBase {
   /** Creates a new Vision. */
-  private final PhotonCamera camera = new PhotonCamera(getName());
+  private final PhotonCamera camera = new PhotonCamera("cam");
+  VisionSystemSim visionSim = new VisionSystemSim("main");
+  SimCameraProperties cameraProp = new SimCameraProperties();
+
+  private PhotonCameraSim cameraSim = new PhotonCameraSim(camera, cameraProp);
+  private final Transform3d cameraToRobot = new Transform3d(new Translation3d(0, 12.25, 0), new Rotation3d());
+  private final Field2d field = new Field2d();
+
   // Pose estimation
   AprilTagFieldLayout fieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
-  private final Transform3d cameraToRobot = new Transform3d(new Translation3d(0, 12.25, 0), new Rotation3d());
   private Transform3d cameraToTarget;
   private Pose2d _pose;
   PhotonPoseEstimator poseEstimator = new PhotonPoseEstimator(fieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
       cameraToRobot);
 
-  //in degrees
+  // in degrees
   double cameraPitch = 20;
-  //in inches
+  // in inches
   double cameraHeight = 5;
 
   boolean targetVisible = false;
@@ -58,17 +71,19 @@ public class Vision extends SubsystemBase {
   RobotContainer rc = RobotContainer.getInstance();
   CommandSwerveDrivetrain driveTrain = rc.drivetrain;
 
-  //Singleton
+  // Singleton
   private static Vision instance;
 
-  public static Vision getInstance(){
-    if(instance == null){
+  public static Vision getInstance() {
+    if (instance == null) {
       instance = new Vision();
     }
     return instance;
   }
 
   public Vision() {
+
+    VisionSimulation();
   }
 
   public Optional<EstimatedRobotPose> getEstimatedGlobalPose() {
@@ -115,35 +130,61 @@ public class Vision extends SubsystemBase {
             targetVisible = true;
           }
         }
-      }
-      else{
+      } else {
         targetVisible = false;
       }
     }
   }
 
-  public Command RequestReef(){
+  public Command RequestReef() {
     Command pathFindingCommand = null;
 
     var waypoints = PathPlannerPath.waypointsFromPoses(
-      new Pose2d());
+        new Pose2d());
 
     PathPlannerPath path = new PathPlannerPath(
-      null, 
-      null, 
-      null, 
-      null);
+        null,
+        null,
+        null,
+        null);
 
     pathFindingCommand = AutoBuilder.followPath(path);
 
     return pathFindingCommand;
   }
 
+  private void VisionSimulation() {
+
+    SmartDashboard.putData("field", field);
+    cameraProp.setCalibration(640, 480, Rotation2d.fromDegrees(100));
+    cameraProp.setCalibError(0.25, 0.08);
+    // Set the camera image capture framerate (Note: this is limited by robot loop
+    // rate).
+    cameraProp.setFPS(40);
+    // The average and standard deviation in milliseconds of image data latency.
+    cameraProp.setAvgLatencyMs(35);
+    cameraProp.setLatencyStdDevMs(5);
+
+    visionSim.addCamera(cameraSim, cameraToRobot);
+    visionSim.getDebugField();
+
+    cameraSim.enableRawStream(true);
+    cameraSim.enableProcessedStream(true);
+
+    // Enable drawing a wireframe visualization of the field to the camera streams.
+    // This is extremely resource-intensive and is disabled by default.
+    cameraSim.enableDrawWireframe(true);
+  }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    field.setRobotPose(_pose);
+    field.setRobotPose(new Pose2d(1.0, 5.0, new Rotation2d())); // Starting position
+    field.getObject("Field").setPose(0, 0, new Rotation2d()); // Overlay custom image
     UpdatePose();
     Logger.recordOutput("VisionPose", _pose);
+    visionSim.update(_pose);
+
   }
 }
