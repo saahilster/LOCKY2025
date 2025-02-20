@@ -13,6 +13,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.motorcontrol.Talon;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -26,9 +27,9 @@ public class Intake extends SubsystemBase {
   /** Creates a new Intake. */
   private final TalonFX intakeMotor = new TalonFX(21, "Other");
   private final TalonFX pivotMotor = new TalonFX(16, "Other");
-  // private LED ledSUb = LED.getInstance();
   private VoltageOut vOut = new VoltageOut(0);
-  private double gearRatio = 25;
+  private MotionMagicVoltage request = new MotionMagicVoltage(0);
+  private double gearRatio = 48.33;
 
   private final SysIdRoutine armRoutine = new SysIdRoutine(
       new SysIdRoutine.Config(
@@ -86,8 +87,12 @@ public class Intake extends SubsystemBase {
     // ledSUb.Intaking();
   }
 
-  public void MovePivot(double speed){
+  public void MovePivot(double speed) {
     pivotMotor.set(speed);
+  }
+
+  public void MagicMove(double degrees) {
+    pivotMotor.setControl(request.withPosition(Units.degreesToRotations(degrees)));
   }
   public double GetPosition(){
     return pivotMotor.getPosition().getValue().in(Degrees);
