@@ -31,15 +31,9 @@ public class LED extends SubsystemBase {
   // defualt anime
   public SingleFadeAnimation defaultAnim = new SingleFadeAnimation(255, 255, 255, 255, 0.07, 100);
 
-<<<<<<< Updated upstream
-  private SingleFadeAnimation reefHeightAnim;
-
-  public StrobeAnimation SHOOT = new StrobeAnimation(0, 255, 0, 0, 0.5, 100);
-=======
   public StrobeAnimation SHOOT = new StrobeAnimation(0, 255, 0, 0, 0.5, 100);
 
   public StrobeAnimation CoralIntake = new StrobeAnimation(0, 200, 200);
->>>>>>> Stashed changes
 
   // private enum LEDState {
   //   L1, L2, L3, L4,
@@ -67,40 +61,6 @@ public class LED extends SubsystemBase {
     return instance;
   }
 
-<<<<<<< Updated upstream
-  public void SetHeightColors(int level) {
-    switch (level) {
-      case 1:
-        reefHeightAnim = new SingleFadeAnimation(level, level, level);
-        break;
-      case 2:
-        reefHeightAnim = new SingleFadeAnimation(level, level, level);
-        break;
-      case 3:
-        reefHeightAnim = new SingleFadeAnimation(level, level, level);
-        break;
-      case 4:
-        reefHeightAnim = new SingleFadeAnimation(level, level, level);
-        break;
-      default:
-        System.out.println("VALUE OUT OF BOUNDS");
-        break;
-    }
-  }
-
-  public void TestLED() {
-    candle.setLEDs(255, 0, 0);
-  }
-
-  public void ChangeLED(int r, int g, int b){
-    candle.setLEDs(r, g, b);
-  }
-
-  public void Intaking() {
-    candle.animate(armAngle);
-  }
-
-=======
   public void TestLED(int r,  int g, int b) {
     candle.setLEDs(r, g, b);
   }
@@ -132,7 +92,6 @@ public class LED extends SubsystemBase {
     candle.animate(armAngle);
   }
 
->>>>>>> Stashed changes
   // private void StateListener(){
   //   switch (state) {
   //     case L1:

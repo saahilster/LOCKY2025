@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
@@ -55,7 +56,7 @@ public class RobotContainer {
     public Intake intakeSub = new Intake();
     // private static Vision visionSub = Vision.getInstance();
     private Arm armSub = Arm.getInstance();
-    // private Climb climbSub = Climb.getInstance();
+    private Climb climbSub = Climb.getInstance();
 
     public double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
     public double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max
@@ -98,6 +99,8 @@ public class RobotContainer {
     private final JoystickButton cascadeHome = new JoystickButton(operator, ControllerConstants.b_SQR);
     private final JoystickButton cascadeHigh = new JoystickButton(operator, ControllerConstants.b_TRI);
     private final JoystickButton intakeSequence = new JoystickButton(operator, ControllerConstants.b_L1);
+    private final JoystickButton L3Button = new JoystickButton(operator, ControllerConstants.b_R1);
+    private final JoystickButton L2Button = new JoystickButton(operator, ControllerConstants.b_R2);
 
     // SysID tuning will be on operator controller
     private final JoystickButton dyanamicForward = new JoystickButton(operator, ControllerConstants.b_SQR);
@@ -134,40 +137,24 @@ public class RobotContainer {
                                                                                   // negative X (left)
                 ));
 
-<<<<<<< Updated upstream
-        
-        slowButton.whileTrue(drivetrain.applyRequest(() -> drive.withVelocityX(-driver.getLeftY() * 1.5) // Drive
-                                                                                                         // forward with
-                                                                                                         // negative Y
-                                                                                                         // (forward)
-=======
         slowButton.whileTrue(drivetrain.applyRequest(() -> drive.withVelocityX(-driver.getLeftY() * 0.9) // Drive
                                                                                                        // forward with
                                                                                                        // negative Y
                                                                                                        // (forward)
->>>>>>> Stashed changes
                 .withVelocityY(-driver.getLeftX() * 1.5) // Drive left with negative X (left)
                 .withRotationalRate(-driver.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X
                                                                           // (left)
         ));
-<<<<<<< Updated upstream
-        slowButton.whileTrue(new RunCommand(()-> ledSub.ChangeLED(240, 200, 90), ledSub));
-        slowButton.whileFalse(new RunCommand(()-> ledSub.ChangeLED(0, 0, 0), ledSub));
+        slowButton.whileTrue(new RunCommand(()-> ledSub.TestLED(240, 200, 90), ledSub));
+        slowButton.whileFalse(new RunCommand(()-> ledSub.TestLED(0, 0, 0), ledSub));
 
-=======
         slowButton.whileTrue(new RunCommand(()-> ledSub.TestLED(200, 150, 0),
         ledSub));
-        slowButton.whileFalse(new RunCommand(()-> ledSub.TestLED(255, 0, 0),
-        ledSub));
->>>>>>> Stashed changes
-
-        brakeButton.whileTrue(drivetrain.applyRequest(() -> brake));
-        recenterButton.onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+        slowButton.whileFalse(new RunCommand(()-> ledSub.TestLED(255, 0, 0)));
         intakeButton.whileTrue(new AlgaeIntake(0.8, intakeSub));
         outTakeButton.whileTrue(new AlgaeIntake(-0.8, intakeSub));
 
         // OPERATOR BINDINGS
-        // For SysID
 
         // dyanamicForward.whileTrue(intakeSub.sysDynamic(Direction.kForward));
         // dyanamicBackward.whileTrue(intakeSub.sysDynamic(Direction.kReverse));
@@ -181,12 +168,6 @@ public class RobotContainer {
         pivotUp.whileTrue(new PivotMagic(intakeSub, -58));
 
         armPosUp.whileTrue(new ArmMagic(armSub, 0));
-<<<<<<< Updated upstream
-        coralHeightPOV.whileTrue(new CascadeMagic(elevatorSub, 15.5894));
-        armPosNeutral.whileTrue(new ArmMagic(armSub, -90));
-        armPosDown.whileTrue(new ArmMagic(armSub, -180));
-=======
->>>>>>> Stashed changes
 
         // coralHeightPOV.whileTrue(new CascadeMagic(elevatorSub, 16.8));
         coralHeightPOV.whileTrue(
@@ -197,25 +178,6 @@ public class RobotContainer {
 
         resetButton.onTrue(new InstantCommand(() -> elevatorSub.ResetPosition(), elevatorSub));
         cascadeHome.whileTrue(new CascadeMagic(elevatorSub, 0));
-<<<<<<< Updated upstream
-        cascadeHigh.whileTrue(new CascadeMagic(elevatorSub, 57.1));
-        intakeSequence.whileTrue(
-            new SequentialCommandGroup(
-                new CascadeMagic(elevatorSub, 45.4).withTimeout(1),
-                new ArmMagic(armSub, -180).withTimeout(0.85),
-                new CascadeMagic(elevatorSub, 35.02).withTimeout(1),
-                new CascadeMagic(elevatorSub, 45.4).withTimeout(0.9),
-                new ArmMagic(armSub, -30)
-            )
-        );
-
-
-        ledTestButton.onTrue(new RunCommand(() -> ledSub.TestLED(), ledSub));
-
-        intakeSub.setDefaultCommand(new RunCommand(()-> intakeSub.MovePivot(operator.getLeftX() * 0.1), intakeSub));
-        elevatorSub.setDefaultCommand(new RunCommand(()-> elevatorSub.ManualMove(-operator.getLeftY() * 0.9), elevatorSub));
-        armSub.setDefaultCommand(new RunCommand(()-> armSub.ManualMove(-operator.getRightY() * 0.5), armSub));
-=======
         // intakeSequence.whileTrue(
         // new SequentialCommandGroup(
         // new CascadeMagic(elevatorSub, 46.24491881238843).withTimeout(1),
@@ -278,7 +240,6 @@ public class RobotContainer {
 
         armSub.setDefaultCommand(new RunCommand(() -> armSub.ManualMove(-operator.getRightY() * 0.5), armSub));
         climbSub.setDefaultCommand(new RunCommand(()-> climbSub.Move(operator.getLeftX()), climbSub));
->>>>>>> Stashed changes
 
         // armUp.whileTrue(new ArmMove(armSub, 0.1));
         // armDown.whileTrue(new ArmMove(armSub, -0.1));
