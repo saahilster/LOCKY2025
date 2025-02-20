@@ -118,8 +118,13 @@ public class Elevator extends SubsystemBase {
     // cascadeConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = minHeight;
 
     var elevateMM = cascadeConfig.MotionMagic;
+<<<<<<< Updated upstream
     elevateMM.MotionMagicCruiseVelocity = 1.67;
     elevateMM.MotionMagicAcceleration = 5;
+=======
+    elevateMM.MotionMagicCruiseVelocity = 7.5;
+    elevateMM.MotionMagicAcceleration = 11;
+>>>>>>> Stashed changes
     elevateMM.MotionMagicJerk = 0;
     rightMotor.getConfigurator().apply(cascadeConfig);
   }

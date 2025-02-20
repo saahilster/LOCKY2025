@@ -41,7 +41,7 @@ public class Constants {
         // steerkD = 0.1;
 
         // Translational Gains (XY)
-        public static double xP = 1.1, xI = 0, xD = 0;
+        public static double xP = 0.5, xI = 0, xD = 0;
 
         // Angular Gains (Theta)
         public static double tP = 4.1, tI = 0.85, tD = 0;

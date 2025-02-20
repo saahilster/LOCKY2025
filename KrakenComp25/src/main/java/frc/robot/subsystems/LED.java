@@ -31,9 +31,15 @@ public class LED extends SubsystemBase {
   // defualt anime
   public SingleFadeAnimation defaultAnim = new SingleFadeAnimation(255, 255, 255, 255, 0.07, 100);
 
+<<<<<<< Updated upstream
   private SingleFadeAnimation reefHeightAnim;
 
   public StrobeAnimation SHOOT = new StrobeAnimation(0, 255, 0, 0, 0.5, 100);
+=======
+  public StrobeAnimation SHOOT = new StrobeAnimation(0, 255, 0, 0, 0.5, 100);
+
+  public StrobeAnimation CoralIntake = new StrobeAnimation(0, 200, 200);
+>>>>>>> Stashed changes
 
   // private enum LEDState {
   //   L1, L2, L3, L4,
@@ -61,6 +67,7 @@ public class LED extends SubsystemBase {
     return instance;
   }
 
+<<<<<<< Updated upstream
   public void SetHeightColors(int level) {
     switch (level) {
       case 1:
@@ -93,6 +100,39 @@ public class LED extends SubsystemBase {
     candle.animate(armAngle);
   }
 
+=======
+  public void TestLED(int r,  int g, int b) {
+    candle.setLEDs(r, g, b);
+  }
+
+  public void ChangeLED(String state){
+    switch (state) {
+        case "Slow":
+            candle.setLEDs(230, 50, 0);
+            break;
+        case "Default":
+            candle.setLEDs(255, 0, 0);
+            break;
+        case "L2":
+            candle.setLEDs(0, 150, 0);
+            break;
+        case "L3":
+            candle.setLEDs(0, 200, 0);
+        case "L4":
+            candle.setLEDs(0, 250, 0);
+        case "CORAL INTAKE":
+            candle.animate(CoralIntake);
+        default:
+            candle.setLEDs(255, 0, 0);
+            break;
+    }
+  }
+
+  public void Intaking() {
+    candle.animate(armAngle);
+  }
+
+>>>>>>> Stashed changes
   // private void StateListener(){
   //   switch (state) {
   //     case L1:

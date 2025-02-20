@@ -5,16 +5,15 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.Elevator;
+import frc.robot.subsystems.Intake;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class CascadeMagic extends Command {
-  /** Creates a new CascadeMagic. */
-  Elevator _sub;
-  double _height;
-
-  public CascadeMagic(Elevator sub, double height) {
-    this._height = height;
+public class PivotCommand extends Command {
+  /** Creates a new PivotCommand. */
+  private Intake _sub;
+  private double _speed;
+  public PivotCommand(Intake sub, double speed) {
+    this._speed = speed;
     this._sub = sub;
     addRequirements(_sub);
     // Use addRequirements() here to declare subsystem dependencies.
@@ -27,12 +26,14 @@ public class CascadeMagic extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    _sub.SetHeight(_height);
+    _sub.MovePivot(_speed);
   }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    _sub.MovePivot(0);
+  }
 
   // Returns true when the command should end.
   @Override
