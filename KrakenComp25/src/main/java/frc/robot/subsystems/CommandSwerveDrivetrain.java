@@ -21,7 +21,6 @@ import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.pathfinding.Pathfinder;
 
-import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -56,7 +55,6 @@ import org.littletonrobotics.junction.Logger;
  * Class that extends the Phoenix 6 SwerveDrivetrain class and implements
  * Subsystem so it can easily be used in command-based projects.
  */
-@Logged
 public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Subsystem {
     private static final double kSimLoopPeriod = 0.005; // 5 ms
     private Notifier m_simNotifier = null;
@@ -82,8 +80,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     private Pigeon2 gyro = new Pigeon2(TunerConstants.kPigeonId);
 
     // For data logging
-    Pose2d poseA = new Pose2d();
-    Pose2d poseB = new Pose2d();
+    Pose2d pose = new Pose2d();
 
     /*
      * SysId routine for characterizing translation. This is used to find PID gains
@@ -272,7 +269,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     @Override
     public void periodic() {
 
-        System.out.println(poseA);
+        // System.out.println(pose);
         Logger.recordOutput("pose", GetCurrentPose());
         /*
          * Periodically try to apply the operator perspective.
@@ -352,8 +349,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     }
 
     public Pose2d GetCurrentPose(){
-        poseA = getState().Pose;
-        return poseA;
+        pose = getState().Pose;
+        return pose;
     }
 
     // @Override

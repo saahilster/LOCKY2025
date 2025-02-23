@@ -11,22 +11,9 @@
           }
         },
         {
-          "type": "sequential",
+          "type": "path",
           "data": {
-            "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "L2 Arm"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "L2 Height"
-                }
-              }
-            ]
+            "pathName": "RotoPath"
           }
         }
       ]
