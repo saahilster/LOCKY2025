@@ -7,6 +7,7 @@ package frc.robot;
 import static edu.wpi.first.units.Units.*;
 
 import java.lang.ModuleLayer.Controller;
+import java.util.jar.Attributes.Name;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -54,7 +55,7 @@ public class RobotContainer {
     private Elevator elevatorSub = Elevator.getInstance();
     private LED ledSub = LED.getInstance();
     public Intake intakeSub = new Intake();
-    private static Vision visionSub = Vision.getInstance();
+//     private static Vision visionSub = Vision.getInstance();
     private Arm armSub = Arm.getInstance();
     private Climb climbSub = Climb.getInstance();
 
@@ -118,35 +119,23 @@ public class RobotContainer {
 
     public RobotContainer() {
 
+
         NamedCommands.registerCommand("Recenter",
                 drivetrain.runOnce(() -> drivetrain.seedFieldCentric()).withTimeout(0.1));
+
+        NamedCommands.registerCommand("L2 Arm", new ArmMagic(armSub, -24.433).withTimeout(0.4));
+        NamedCommands.registerCommand("L2 Height", new CascadeMagic(elevatorSub, 15).withTimeout(1.3));
+
+        NamedCommands.registerCommand("L3 Arm", new ArmMagic(armSub, -37).withTimeout(0.4));
+        NamedCommands.registerCommand("L3 Height", new CascadeMagic(elevatorSub, 32.293).withTimeout(1.6));
+
+        NamedCommands.registerCommand("L4 Arm", new ArmMagic(armSub, -24.345703125).withTimeout(0.4));
+        NamedCommands.registerCommand("L4 Height", new CascadeMagic(elevatorSub, 56.504).withTimeout(1.75));
+                                               
         configureBindings();
 
-        NamedCommands.registerCommand("L2",  new ParallelCommandGroup(
-                new CascadeMagic(elevatorSub, 15),
-                new ArmMagic(armSub, -24.433)).withTimeout(1));
-        
-        NamedCommands.registerCommand("L3", new ParallelCommandGroup(
-                new CascadeMagic(elevatorSub, 32.293),
-                new ArmMagic(armSub, -37)).withTimeout(1.75));
-        
-        NamedCommands.registerCommand("L4", new ParallelCommandGroup(
-                new CascadeMagic(elevatorSub, 56.504),
-                new ArmMagic(armSub, -24.345703125)).withTimeout(3));
-        
-        NamedCommands.registerCommand("Intake Coral", new ParallelCommandGroup(
-                new CascadeMagic(elevatorSub, 46.24491881238843).withTimeout(0.5)
-                        .alongWith(
-                                // Add a delay to the ArmMagic command
-                                new SequentialCommandGroup(
-                                        new WaitCommand(0.2), // Adjust the delay time (in seconds) as needed
-                                        new ArmMagic(armSub, -175).withTimeout(0.5)))
-                        .andThen(
-                                new WaitCommand(0.65),
-                                new CascadeMagic(elevatorSub, 34.38456285565362).withTimeout(0.5)
-                                        .andThen(new CascadeMagic(elevatorSub, 46.24491881238843)
-                                                .withTimeout(0.5).alongWith(new WaitCommand(0.3))
-                                                .andThen(new ArmMagic(armSub, -30))))).withTimeout(3.15));
+        drivetrain.resetPose(new Pose2d(new Translation2d(3.4, 4), new Rotation2d(0)));
+
     }
 
     private void configureBindings() {

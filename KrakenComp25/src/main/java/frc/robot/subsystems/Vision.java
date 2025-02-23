@@ -80,16 +80,16 @@ public class Vision extends SubsystemBase {
     return visionEst;
   }
 
-  public void UpdatePose() {
-    var visionEst = getEstimatedGlobalPose();
-    visionEst.ifPresent(est -> {
-      driveTrain.addVisionMeasurement(est.estimatedPose.toPose2d(), est.timestampSeconds);
-      _pose = est.estimatedPose.toPose2d();
-      double timestamp = est.timestampSeconds;
-      driveTrain.addVisionMeasurement(_pose, timestamp);
-      System.out.println("Vision Pose: " + est.estimatedPose.toPose2d());
-    });
-  }
+  // public void UpdatePose() {
+  //   var visionEst = getEstimatedGlobalPose();
+  //   visionEst.ifPresent(est -> {
+  //     driveTrain.addVisionMeasurement(est.estimatedPose.toPose2d(), est.timestampSeconds);
+  //     _pose = est.estimatedPose.toPose2d();
+  //     double timestamp = est.timestampSeconds;
+  //     driveTrain.addVisionMeasurement(_pose, timestamp);
+  //     System.out.println("Vision Pose: " + est.estimatedPose.toPose2d());
+  //   });
+  // }
 
   // TODO: Find translation and rotation distances from april tags
   // TODO: Find how to drive request to position based off of april tags
@@ -145,7 +145,7 @@ public class Vision extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    UpdatePose();
-    Logger.recordOutput("VisionPose", _pose);
+    // UpdatePose();
+    // Logger.recordOutput("VisionPose", _pose);
   }
 }
