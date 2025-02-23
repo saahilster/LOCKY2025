@@ -54,7 +54,7 @@ public class RobotContainer {
     private Elevator elevatorSub = Elevator.getInstance();
     private LED ledSub = LED.getInstance();
     public Intake intakeSub = new Intake();
-    // private static Vision visionSub = Vision.getInstance();
+    private static Vision visionSub = Vision.getInstance();
     private Arm armSub = Arm.getInstance();
     private Climb climbSub = Climb.getInstance();
 
@@ -94,7 +94,6 @@ public class RobotContainer {
     private final POVButton coralHeightPOV = new POVButton(operator, 180);
     private final POVButton pivotUp = new POVButton(operator, 270);
     private final POVButton pivotDown = new POVButton(operator, 90);
-    private final JoystickButton cascade1 = new JoystickButton(operator, ControllerConstants.b_X);
     private final JoystickButton resetButton = new JoystickButton(operator, ControllerConstants.b_O);
     private final JoystickButton cascadeHome = new JoystickButton(operator, ControllerConstants.b_SQR);
     private final JoystickButton cascadeHigh = new JoystickButton(operator, ControllerConstants.b_TRI);
@@ -121,8 +120,33 @@ public class RobotContainer {
 
         NamedCommands.registerCommand("Recenter",
                 drivetrain.runOnce(() -> drivetrain.seedFieldCentric()).withTimeout(0.1));
-        drivetrain.resetPose(new Pose2d(new Translation2d(3.4, 4), new Rotation2d(0)));
         configureBindings();
+
+        NamedCommands.registerCommand("L2",  new ParallelCommandGroup(
+                new CascadeMagic(elevatorSub, 15),
+                new ArmMagic(armSub, -24.433)).withTimeout(1));
+        
+        NamedCommands.registerCommand("L3", new ParallelCommandGroup(
+                new CascadeMagic(elevatorSub, 32.293),
+                new ArmMagic(armSub, -37)).withTimeout(1.75));
+        
+        NamedCommands.registerCommand("L4", new ParallelCommandGroup(
+                new CascadeMagic(elevatorSub, 56.504),
+                new ArmMagic(armSub, -24.345703125)).withTimeout(3));
+        
+        NamedCommands.registerCommand("Intake Coral", new ParallelCommandGroup(
+                new CascadeMagic(elevatorSub, 46.24491881238843).withTimeout(0.5)
+                        .alongWith(
+                                // Add a delay to the ArmMagic command
+                                new SequentialCommandGroup(
+                                        new WaitCommand(0.2), // Adjust the delay time (in seconds) as needed
+                                        new ArmMagic(armSub, -175).withTimeout(0.5)))
+                        .andThen(
+                                new WaitCommand(0.65),
+                                new CascadeMagic(elevatorSub, 34.38456285565362).withTimeout(0.5)
+                                        .andThen(new CascadeMagic(elevatorSub, 46.24491881238843)
+                                                .withTimeout(0.5).alongWith(new WaitCommand(0.3))
+                                                .andThen(new ArmMagic(armSub, -30))))).withTimeout(3.15));
     }
 
     private void configureBindings() {
@@ -130,12 +154,12 @@ public class RobotContainer {
         // and Y is defined as to the left according to WPILib convention.
         drivetrain.setDefaultCommand(
             // Drivetrain will execute this command periodically
-            drivetrain.applyRequest(() -> drive.withVelocityX(-driver.getLeftY() * MaxSpeed) // Drive forward with
-                                                                                             // negative Y (forward)
+            drivetrain.applyRequest(() ->
+                drive.withVelocityX(-driver.getLeftY() * MaxSpeed) // Drive forward with negative Y (forward)
                     .withVelocityY(-driver.getLeftX() * MaxSpeed) // Drive left with negative X (left)
-                    .withRotationalRate(-driver.getRightX() * MaxAngularRate) // Drive counterclockwise with
-                                                                              // negative X (left)
-            ));
+                    .withRotationalRate(-driver.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
+            )
+        );
 
     
             slowButton.whileTrue(drivetrain.applyRequest(() -> drive.withVelocityX(-driver.getLeftY() * 1) // Drive
@@ -146,6 +170,8 @@ public class RobotContainer {
             .withRotationalRate(-driver.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X
                                                                       // (left)
         ));
+
+        recenterButton.onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
         slowButton.whileTrue(new RunCommand(()-> ledSub.TestLED(240, 200, 90), ledSub));
         slowButton.whileFalse(new RunCommand(()-> ledSub.TestLED(0, 0, 0), ledSub));
@@ -158,13 +184,10 @@ public class RobotContainer {
 
         // OPERATOR BINDINGS
 
-        // dyanamicForward.whileTrue(intakeSub.sysDynamic(Direction.kForward));
-        // dyanamicBackward.whileTrue(intakeSub.sysDynamic(Direction.kReverse));
-        // quasiForward.whileTrue(intakeSub.sysQuasistatic(Direction.kForward));
-        // quasiBackward.whileTrue(intakeSub.sysQuasistatic(Direction.kReverse));
-
-        // pivotDown.whileTrue(new PivotCommand(intakeSub, 0.1));
-        // pivotUp.whileTrue(new PivotCommand(intakeSub, -0.1));
+        dyanamicForward.whileTrue(intakeSub.sysDynamic(Direction.kForward));
+        dyanamicBackward.whileTrue(intakeSub.sysDynamic(Direction.kReverse));
+        quasiForward.whileTrue(intakeSub.sysQuasistatic(Direction.kForward));
+        quasiBackward.whileTrue(intakeSub.sysQuasistatic(Direction.kReverse));
 
         pivotDown.whileTrue(new PivotCommand(intakeSub, 0.10));
         pivotUp.whileTrue(new PivotCommand(intakeSub, -0.10));
@@ -174,12 +197,16 @@ public class RobotContainer {
         // coralHeightPOV.whileTrue(new CascadeMagic(elevatorSub, 16.8));
         coralHeightPOV.whileTrue(
                 new ParallelCommandGroup(
-                        new CascadeMagic(elevatorSub, 16.8)).
+                        new CascadeMagic(elevatorSub, 16.397)).
                         alongWith(new ArmMagic(armSub, 0))
                         );
 
-        resetButton.onTrue(new InstantCommand(() -> elevatorSub.ResetPosition(), elevatorSub));
-        cascadeHome.whileTrue(new CascadeMagic(elevatorSub, 0));
+        //TODO: unslash
+        // resetButton.onTrue(new InstantCommand(() -> elevatorSub.ResetPosition(), elevatorSub));
+
+        //TODO:: unslash
+        // cascadeHome.whileTrue(new CascadeMagic(elevatorSub, 0));
+
         // intakeSequence.whileTrue(
         // new SequentialCommandGroup(
         // new CascadeMagic(elevatorSub, 46.24491881238843).withTimeout(1),
@@ -209,6 +236,7 @@ public class RobotContainer {
         intakeSequence.whileFalse(new RunCommand(()-> ledSub.TestLED(255, 0, 0),
         ledSub));
 
+        //TODO: unslash
         cascadeHigh.whileTrue(
                 new ParallelCommandGroup(
                         new CascadeMagic(elevatorSub, 56.504),

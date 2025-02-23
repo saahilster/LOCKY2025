@@ -85,17 +85,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     Pose2d poseA = new Pose2d();
     Pose2d poseB = new Pose2d();
 
-    private SwerveDriveOdometry swereOdemetry = new SwerveDriveOdometry(
-        fetchKinematics(),
-        GetGyro().getRotation2d(),
-        new SwerveModulePosition[] {
-            new SwerveModulePosition(0, Rotation2d.fromDegrees(0)),
-            new SwerveModulePosition(0, Rotation2d.fromDegrees(0)),
-            new SwerveModulePosition(0, Rotation2d.fromDegrees(0)),
-            new SwerveModulePosition(0, Rotation2d.fromDegrees(0))
-        }
-    );
-
     /*
      * SysId routine for characterizing translation. This is used to find PID gains
      * for the drive motors.
@@ -363,8 +352,33 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
     public Pose2d GetCurrentPose(){
         poseA = getState().Pose;
-        //this creates the pathing to be very long. No bueno.
-        Pose2d newTranslation = poseA.plus(new Transform2d(new Translation2d(3.4, 4), kBlueAlliancePerspectiveRotation));
         return poseA;
+    }
+
+    @Override
+    public void addVisionMeasurement(Pose2d visionRobotPoseMeters, double timestampSeconds) {
+        super.addVisionMeasurement(visionRobotPoseMeters, Utils.fpgaToCurrentTime(timestampSeconds));
+    }
+
+    /**
+     * Adds a vision measurement to the Kalman Filter. This will correct the odometry pose estimate
+     * while still accounting for measurement noise.
+     * <p>
+     * Note that the vision measurement standard deviations passed into this method
+     * will continue to apply to future measurements until a subsequent call to
+     * {@link #setVisionMeasurementStdDevs(Matrix)} or this method.
+     *
+     * @param visionRobotPoseMeters The pose of the robot as measured by the vision camera.
+     * @param timestampSeconds The timestamp of the vision measurement in seconds.
+     * @param visionMeasurementStdDevs Standard deviations of the vision pose measurement
+     *     in the form [x, y, theta]ᵀ, with units in meters and radians.
+     */
+    @Override
+    public void addVisionMeasurement(
+        Pose2d visionRobotPoseMeters,
+        double timestampSeconds,
+        Matrix<N3, N1> visionMeasurementStdDevs
+    ) {
+        super.addVisionMeasurement(visionRobotPoseMeters, Utils.fpgaToCurrentTime(timestampSeconds), visionMeasurementStdDevs);
     }
 }

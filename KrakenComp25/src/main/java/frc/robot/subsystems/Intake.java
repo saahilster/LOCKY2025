@@ -33,8 +33,8 @@ public class Intake extends SubsystemBase {
 
   private final SysIdRoutine armRoutine = new SysIdRoutine(
       new SysIdRoutine.Config(
-          Volts.per(Seconds).of(0.2),
-          Volts.of(0.4),
+          Volts.per(Seconds).of(0.35),
+          Volts.of(0.5),
           Seconds.of(3),
           state -> SignalLogger.writeString("pivot state", state.toString())),
       new SysIdRoutine.Mechanism(
@@ -63,15 +63,15 @@ public class Intake extends SubsystemBase {
     slot0Config.kI = 0;
     slot0Config.kD = 0;
 
-    armConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
-    armConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = 5;
-    armConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
-    armConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = -190;
+    // armConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
+    // armConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = 0;
+    // armConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
+    // armConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = -150;
 
     var armMM = armConfig.MotionMagic;
-    armMM.withMotionMagicCruiseVelocity(0).
-    withMotionMagicAcceleration(0).
-    withMotionMagicJerk(0);
+    armMM.MotionMagicCruiseVelocity = 7.5;
+    armMM.MotionMagicAcceleration = 12;
+    armMM.MotionMagicJerk = 0;
     // armMotor.getConfigurator().apply(slot0Config);
     pivotMotor.getConfigurator().apply(armConfig);
   }

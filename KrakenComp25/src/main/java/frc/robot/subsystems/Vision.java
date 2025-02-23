@@ -36,7 +36,8 @@ import frc.robot.generated.TunerConstants;
 
 public class Vision extends SubsystemBase {
   /** Creates a new Vision. */
-  private final PhotonCamera camera = new PhotonCamera(getName());
+  private final PhotonCamera camera = new PhotonCamera("Vision");
+  // private final PhotonCamera cameraClimb = new PhotonCamera("Climb");
   // Pose estimation
   AprilTagFieldLayout fieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
   private final Transform3d cameraToRobot = new Transform3d(new Translation3d(0, 12.25, 0), new Rotation3d());
@@ -86,6 +87,7 @@ public class Vision extends SubsystemBase {
       _pose = est.estimatedPose.toPose2d();
       double timestamp = est.timestampSeconds;
       driveTrain.addVisionMeasurement(_pose, timestamp);
+      System.out.println("Vision Pose: " + est.estimatedPose.toPose2d());
     });
   }
 
