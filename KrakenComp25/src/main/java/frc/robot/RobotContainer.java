@@ -131,6 +131,9 @@ public class RobotContainer {
 
         NamedCommands.registerCommand("L4 Arm", new ArmMagic(armSub, -24.345703125).withTimeout(0.4));
         NamedCommands.registerCommand("L4 Height", new CascadeMagic(elevatorSub, 56.504).withTimeout(1.75));
+
+        NamedCommands.registerCommand("Arm Reset", new ArmMagic(armSub, 0));
+        NamedCommands.registerCommand("Elevator Reset", new CascadeMagic(elevatorSub, 0));
                                                
         configureBindings();
 
