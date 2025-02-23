@@ -28,6 +28,7 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -80,16 +81,16 @@ public class Vision extends SubsystemBase {
     return visionEst;
   }
 
-  // public void UpdatePose() {
-  //   var visionEst = getEstimatedGlobalPose();
-  //   visionEst.ifPresent(est -> {
-  //     driveTrain.addVisionMeasurement(est.estimatedPose.toPose2d(), est.timestampSeconds);
-  //     _pose = est.estimatedPose.toPose2d();
-  //     double timestamp = est.timestampSeconds;
-  //     driveTrain.addVisionMeasurement(_pose, timestamp);
-  //     System.out.println("Vision Pose: " + est.estimatedPose.toPose2d());
-  //   });
-  // }
+  public void UpdatePose() {
+    var visionEst = getEstimatedGlobalPose();
+    visionEst.ifPresent(est -> {
+      driveTrain.addVisionMeasurement(est.estimatedPose.toPose2d(), est.timestampSeconds);
+      _pose = est.estimatedPose.toPose2d();
+      double timestamp = est.timestampSeconds;
+      driveTrain.addVisionMeasurement(driveTrain.getState().Pose, timestamp);
+      System.out.println("Vision Pose: " + est.estimatedPose.toPose2d());
+    });
+  }
 
   // TODO: Find translation and rotation distances from april tags
   // TODO: Find how to drive request to position based off of april tags
@@ -145,7 +146,9 @@ public class Vision extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    // UpdatePose();
-    // Logger.recordOutput("VisionPose", _pose);
+    UpdatePose();
+    Logger.recordOutput("VisionPose", driveTrain.getState().Pose);
+    System.out.println("Vision Pose: " + driveTrain.getState().Pose);
+    
   }
 }

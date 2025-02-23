@@ -55,7 +55,7 @@ public class RobotContainer {
     private Elevator elevatorSub = Elevator.getInstance();
     private LED ledSub = LED.getInstance();
     public Intake intakeSub = new Intake();
-//     private static Vision visionSub = Vision.getInstance();
+    private static Vision visionSub = Vision.getInstance();
     private Arm armSub = Arm.getInstance();
     private Climb climbSub = Climb.getInstance();
 
