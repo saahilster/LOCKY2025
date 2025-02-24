@@ -147,8 +147,6 @@ public class Vision extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
     UpdatePose();
-    Logger.recordOutput("VisionPose", driveTrain.getState().Pose);
-    System.out.println("Vision Pose: " + driveTrain.getState().Pose);
-    
+    Logger.recordOutput("VisionPose", driveTrain.getState().Pose);    
   }
 }

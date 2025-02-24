@@ -181,8 +181,8 @@ public class RobotContainer {
         quasiForward.whileTrue(intakeSub.sysQuasistatic(Direction.kForward));
         quasiBackward.whileTrue(intakeSub.sysQuasistatic(Direction.kReverse));
 
-        pivotDown.whileTrue(new PivotCommand(intakeSub, 0.10));
-        pivotUp.whileTrue(new PivotCommand(intakeSub, -0.10));
+        pivotDown.whileTrue(new PivotMagic(intakeSub, 16));
+        pivotUp.whileTrue(new PivotMagic(intakeSub, 90));
 
         armPosUp.whileTrue(new ArmMagic(armSub, 0));
 
@@ -198,15 +198,6 @@ public class RobotContainer {
 
         //TODO:: unslash
         // cascadeHome.whileTrue(new CascadeMagic(elevatorSub, 0));
-
-        // intakeSequence.whileTrue(
-        // new SequentialCommandGroup(
-        // new CascadeMagic(elevatorSub, 46.24491881238843).withTimeout(1),
-        // new ArmMagic(armSub, -180).withTimeout(0.85),
-        // new CascadeMagic(elevatorSub, 34.38456285565362).withTimeout(1),
-        // new CascadeMagic(elevatorSub, 46.24491881238843).withTimeout(0.9)
-        // )
-        // );
 
         intakeSequence.whileTrue(
                 new ParallelCommandGroup(

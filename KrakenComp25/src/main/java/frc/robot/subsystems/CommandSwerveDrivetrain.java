@@ -88,8 +88,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
      */
     private final SysIdRoutine m_sysIdRoutineTranslation = new SysIdRoutine(
             new SysIdRoutine.Config(
-                    null, // Use default ramp rate (1 V/s)
-                    Volts.of(4), // Reduce dynamic step voltage to 4 V to prevent brownout
+                    Volts.per(Seconds).of(0.3), // Use default ramp rate (1 V/s)
+                    Volts.of(1), // Reduce dynamic step voltage to 4 V to prevent brownout
                     null, // Use default timeout (10 s)
                     // Log state with SignalLogger class
                     state -> SignalLogger.writeString("SysIdTranslation_State", state.toString())),
@@ -104,8 +104,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
      */
     private final SysIdRoutine m_sysIdRoutineSteer = new SysIdRoutine(
             new SysIdRoutine.Config(
-                    null, // Use default ramp rate (1 V/s)
-                    Volts.of(7), // Use dynamic voltage of 7 V
+                    Volts.per(Seconds).of(0.3), // Use default ramp rate (1 V/s)
+                    Volts.of(2), // Use dynamic voltage of 7 V
                     null, // Use default timeout (10 s)
                     // Log state with SignalLogger class
                     state -> SignalLogger.writeString("SysIdSteer_State", state.toString())),

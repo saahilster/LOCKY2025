@@ -5,16 +5,19 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix6.SignalLogger;
+import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfigurator;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.motorcontrol.Talon;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
@@ -51,15 +54,18 @@ public class Intake extends SubsystemBase {
 
   private void Config() {
     var armConfig = new TalonFXConfiguration();
+
+
     armConfig.Feedback.SensorToMechanismRatio = gearRatio;
-    armConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+    armConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
     pivotMotor.setNeutralMode(NeutralModeValue.Brake);
     var slot0Config = armConfig.Slot0;
+    slot0Config.GravityType = GravityTypeValue.Arm_Cosine;
     slot0Config.kS = 0;
     slot0Config.kV = 0;
     slot0Config.kA = 0;
-    // slot0Config.kG = 38.404;
-    slot0Config.kP = 0;
+    slot0Config.kG = 0.3;
+    slot0Config.kP = 40;
     slot0Config.kI = 0;
     slot0Config.kD = 0;
 
@@ -69,8 +75,8 @@ public class Intake extends SubsystemBase {
     // armConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = -150;
 
     var armMM = armConfig.MotionMagic;
-    armMM.MotionMagicCruiseVelocity = 7.5;
-    armMM.MotionMagicAcceleration = 12;
+    armMM.MotionMagicCruiseVelocity = 2;
+    armMM.MotionMagicAcceleration = 6.4;
     armMM.MotionMagicJerk = 0;
     // armMotor.getConfigurator().apply(slot0Config);
     pivotMotor.getConfigurator().apply(armConfig);
@@ -80,6 +86,7 @@ public class Intake extends SubsystemBase {
   public Intake() {
     intakeMotor.setNeutralMode(NeutralModeValue.Brake);
     Config();
+    pivotMotor.setPosition(Units.degreesToRotations(90));
   }
 
   public void MoveIntake(double speed){
@@ -103,5 +110,6 @@ public class Intake extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
     // System.out.println(GetPosition());
+    SmartDashboard.putNumber("Pivot Degrees", GetPosition());
   }
 }
