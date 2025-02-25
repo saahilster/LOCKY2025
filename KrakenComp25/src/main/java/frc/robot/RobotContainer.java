@@ -36,6 +36,7 @@ import frc.robot.commands.AlgaeIntake;
 import frc.robot.commands.ArmMagic;
 import frc.robot.commands.CascadeMagic;
 import frc.robot.commands.CascadeMove;
+import frc.robot.commands.ClimbMove;
 import frc.robot.commands.PivotCommand;
 import frc.robot.commands.PivotMagic;
 import frc.robot.generated.TunerConstants;
@@ -64,7 +65,7 @@ public class RobotContainer {
                                                                                      // angular velocity
     /* Setting up bindings for necessary control of the swerve drive platform */
     private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
-            .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
+            .withDeadband(MaxSpeed * 0.05).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
             .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
     private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
     private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
@@ -84,6 +85,8 @@ public class RobotContainer {
     private final JoystickButton intakeButton = new JoystickButton(driver, ControllerConstants.b_X);
     private final JoystickButton outTakeButton = new JoystickButton(driver, ControllerConstants.b_O);
     private final JoystickButton ledTestButton = new JoystickButton(driver, ControllerConstants.b_TRI);
+    private final POVButton climbUp = new POVButton(driver, 0);
+    private final POVButton climbDown = new POVButton(driver, 180);
 
     // OPERATOR INPUTS
 
@@ -176,10 +179,10 @@ public class RobotContainer {
 
         // OPERATOR BINDINGS
 
-        dyanamicForward.whileTrue(intakeSub.sysDynamic(Direction.kForward));
-        dyanamicBackward.whileTrue(intakeSub.sysDynamic(Direction.kReverse));
-        quasiForward.whileTrue(intakeSub.sysQuasistatic(Direction.kForward));
-        quasiBackward.whileTrue(intakeSub.sysQuasistatic(Direction.kReverse));
+        // dyanamicForward.whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
+        // dyanamicBackward.whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
+        // quasiForward.whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
+        // quasiBackward.whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
 
         pivotDown.whileTrue(new PivotMagic(intakeSub, 16));
         pivotUp.whileTrue(new PivotMagic(intakeSub, 90));
@@ -252,7 +255,10 @@ public class RobotContainer {
         elevatorSub.setDefaultCommand(new RunCommand(() -> elevatorSub.ManualMove(-operator.getLeftY() * 0.9), elevatorSub));
 
         armSub.setDefaultCommand(new RunCommand(() -> armSub.ManualMove(-operator.getRightY() * 0.5), armSub));
-        climbSub.setDefaultCommand(new RunCommand(()-> climbSub.Move(operator.getLeftX()), climbSub));
+        // climbSub.setDefaultCommand(new RunCommand(()-> climbSub.Move(operator.getLeftX()), climbSub));
+
+        climbUp.whileTrue(new ClimbMove(0.3, climbSub));
+        climbDown.whileTrue(new ClimbMove(-0.3, climbSub));
 
         // armUp.whileTrue(new ArmMove(armSub, 0.1));
         // armDown.whileTrue(new ArmMove(armSub, -0.1));

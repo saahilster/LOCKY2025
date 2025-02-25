@@ -24,11 +24,7 @@ public class Constants {
                 b_RJOY = 12,
                 b_LOG = 13,
                 b_PAD = 14,
-                b_MIC = 15,
-
-                // PURPOSE: arm moves based upon pressure on triggers
-                leftTriggerAxis = 3,
-                rightTriggerAxis = 4;
+                b_MIC = 15;
     }
 
     public static final class AutonConstants {
@@ -41,16 +37,10 @@ public class Constants {
         // steerkD = 0.1;
 
         // Translational Gains (XY)
-        public static double xP = 1.1, xI = 0, xD = 0;
+        public static double xP = 30, xI = 0, xD = 0;
 
         // Angular Gains (Theta)
-        public static double tP = 4.1, tI = 0.85, tD = 0;
-
-        // // Translational Gains (XY)
-        // public static double xP = 0.5, xI = 2.25, xD = 0.1;
-
-        // // Angular Gains (Theta)
-        // public static double tP = 0.55, tI = 4, tD = 0.2;
+        public static double tP = 9, tI = 0, tD = 0;
     }
 
     public static final class MotorConstants {

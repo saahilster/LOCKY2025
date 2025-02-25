@@ -9,50 +9,6 @@
           "data": {
             "name": "Recenter"
           }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "RotoPath"
-          }
-        },
-        {
-          "type": "parallel",
-          "data": {
-            "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "L2 Arm"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "L2 Height"
-                }
-              }
-            ]
-          }
-        },
-        {
-          "type": "parallel",
-          "data": {
-            "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "Arm Reset"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Elevator Reset"
-                }
-              }
-            ]
-          }
         }
       ]
     }
