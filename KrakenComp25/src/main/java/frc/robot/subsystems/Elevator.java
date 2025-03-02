@@ -87,6 +87,7 @@ public class Elevator extends SubsystemBase {
     }
 
   public Elevator() {
+    ResetPosition();
     BrakeMode();
     CascadeConfig();
     rightMotor.setControl(follow);
@@ -116,10 +117,10 @@ public class Elevator extends SubsystemBase {
     slot0Config.kI = 0;
     slot0Config.kD = 1.637;
 
-    // cascadeConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
-    // cascadeConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = 57;
-    // cascadeConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
-    // cascadeConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = 0;
+    cascadeConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
+    cascadeConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = 56.5;
+    cascadeConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
+    cascadeConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = 0;
 
     var elevateMM = cascadeConfig.MotionMagic;
     elevateMM.MotionMagicCruiseVelocity = 7.5;
@@ -138,7 +139,9 @@ public class Elevator extends SubsystemBase {
   }
 
   public void ResetPosition(){
+    // leftMotor.setPosition(2.662223657375);
     leftMotor.setPosition(0);
+
   }
 
 

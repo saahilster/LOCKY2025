@@ -341,7 +341,9 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                 () -> this.getState().Pose,
                 this::resetPose,
                 this::getChassisSpeeds,
-                (speeds, feedforwards) -> this.setControl(autoRequest.withSpeeds(speeds)),
+                (speeds, feedforwards) -> this.setControl(autoRequest.withSpeeds(speeds)
+                .withWheelForceFeedforwardsX(feedforwards.robotRelativeForcesXNewtons())
+                .withWheelForceFeedforwardsY(feedforwards.robotRelativeForcesYNewtons())),
                 new PPHolonomicDriveController(xPID, tPID),
                 config, // Now config is guaranteed to be initialized
                 () -> DriverStation.getAlliance().map(alliance -> alliance == DriverStation.Alliance.Red).orElse(false),

@@ -28,7 +28,6 @@ public class CascadeMagic extends Command {
   @Override
   public void execute() {
     _sub.SetHeight(_height);
-    System.out.println("Callede");
   }
 
   // Called once the command ends or is interrupted.

@@ -60,6 +60,11 @@ public class RobotContainer {
     private Arm armSub = Arm.getInstance();
     private Climb climbSub = Climb.getInstance();
 
+    private double coralHeight = 16.18,
+    L4Height = 56.504,
+    L3Height = 32.293,
+    L2Height = 15;
+
     public double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
     public double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max
                                                                                      // angular velocity
@@ -127,16 +132,26 @@ public class RobotContainer {
                 drivetrain.runOnce(() -> drivetrain.seedFieldCentric()).withTimeout(0.1));
 
         NamedCommands.registerCommand("L2 Arm", new ArmMagic(armSub, -24.433).withTimeout(0.4));
-        NamedCommands.registerCommand("L2 Height", new CascadeMagic(elevatorSub, 15).withTimeout(1.3));
+        NamedCommands.registerCommand("L2 Height", new CascadeMagic(elevatorSub, L2Height).withTimeout(1.3));
+        NamedCommands.registerCommand("L2 Place", new ArmMagic(armSub, -80).withTimeout(0.4));
 
         NamedCommands.registerCommand("L3 Arm", new ArmMagic(armSub, -37).withTimeout(0.4));
-        NamedCommands.registerCommand("L3 Height", new CascadeMagic(elevatorSub, 32.293).withTimeout(1.6));
+        NamedCommands.registerCommand("L3 Height", new CascadeMagic(elevatorSub, L3Height).withTimeout(1.6));
+        NamedCommands.registerCommand("L3 Place", new ArmMagic(armSub, -67));
 
         NamedCommands.registerCommand("L4 Arm", new ArmMagic(armSub, -24.345703125).withTimeout(0.4));
-        NamedCommands.registerCommand("L4 Height", new CascadeMagic(elevatorSub, 56.504).withTimeout(1.75));
+        NamedCommands.registerCommand("L4 Height", new CascadeMagic(elevatorSub, L4Height).withTimeout(1.75));
 
-        NamedCommands.registerCommand("Arm Reset", new ArmMagic(armSub, 0));
-        NamedCommands.registerCommand("Elevator Reset", new CascadeMagic(elevatorSub, 0));
+        NamedCommands.registerCommand("Arm Reset", new ArmMagic(armSub, 0).withTimeout(0.3));
+        NamedCommands.registerCommand("Elevator Reset", new CascadeMagic(elevatorSub, 0).withTimeout(0.3));
+
+        NamedCommands.registerCommand("Feed Height", new CascadeMagic(elevatorSub, coralHeight).withTimeout(0.4));
+        NamedCommands.registerCommand("Arm Reset", new ArmMagic(armSub, 0).withTimeout(0.4));
+
+        NamedCommands.registerCommand("Arm Clearance Height", new CascadeMagic(elevatorSub, 46.2449).withTimeout(0.5));
+        NamedCommands.registerCommand("Bite Height", new CascadeMagic(elevatorSub, 34.3845).withTimeout(0.5));
+        NamedCommands.registerCommand("Bite Angle", new ArmMagic(armSub, -182).withTimeout(0.5));
+        NamedCommands.registerCommand("Cruise Arm Angle", new ArmMagic(armSub, -30).withTimeout(0.3));
                                                
         configureBindings();
 
@@ -171,7 +186,7 @@ public class RobotContainer {
         slowButton.whileTrue(new RunCommand(()-> ledSub.TestLED(240, 200, 90), ledSub));
         slowButton.whileFalse(new RunCommand(()-> ledSub.TestLED(0, 0, 0), ledSub));
 
-        slowButton.whileTrue(new RunCommand(()-> ledSub.TestLED(200, 150, 0),
+        slowButton.whileTrue(new RunCommand(()-> ledSub.TestLED(255, 255, 255),
         ledSub));
         slowButton.whileFalse(new RunCommand(()-> ledSub.TestLED(255, 0, 0)));
         intakeButton.whileTrue(new AlgaeIntake(0.8, intakeSub));
@@ -192,15 +207,15 @@ public class RobotContainer {
         // coralHeightPOV.whileTrue(new CascadeMagic(elevatorSub, 16.8));
         coralHeightPOV.whileTrue(
                 new ParallelCommandGroup(
-                        new CascadeMagic(elevatorSub, 16.397)).
+                        new CascadeMagic(elevatorSub, 16.18)).
                         alongWith(new ArmMagic(armSub, 0))
                         );
 
-        //TODO: unslash
-        // resetButton.onTrue(new InstantCommand(() -> elevatorSub.ResetPosition(), elevatorSub));
+        // TODO: unslash
+        resetButton.onTrue(new InstantCommand(() -> elevatorSub.ResetPosition(), elevatorSub));
 
-        //TODO:: unslash
-        // cascadeHome.whileTrue(new CascadeMagic(elevatorSub, 0));
+        // TODO:: unslash
+        cascadeHome.whileTrue(new CascadeMagic(elevatorSub, 0));
 
         intakeSequence.whileTrue(
                 new ParallelCommandGroup(
@@ -209,10 +224,10 @@ public class RobotContainer {
                                         // Add a delay to the ArmMagic command
                                         new SequentialCommandGroup(
                                                 new WaitCommand(0.2), // Adjust the delay time (in seconds) as needed
-                                                new ArmMagic(armSub, -175).withTimeout(0.5)))
+                                                new ArmMagic(armSub, -180).withTimeout(0.5)))
                                 .andThen(
                                         new WaitCommand(0.65),
-                                        new CascadeMagic(elevatorSub, 34.38456285565362).withTimeout(0.5)
+                                        new CascadeMagic(elevatorSub, 32.38456285565362).withTimeout(0.5)
                                                 .andThen(new CascadeMagic(elevatorSub, 46.24491881238843)
                                                         .withTimeout(0.5).alongWith(new WaitCommand(0.3))
                                                         .andThen(new ArmMagic(armSub, -30))))));
@@ -257,8 +272,8 @@ public class RobotContainer {
         armSub.setDefaultCommand(new RunCommand(() -> armSub.ManualMove(-operator.getRightY() * 0.5), armSub));
         // climbSub.setDefaultCommand(new RunCommand(()-> climbSub.Move(operator.getLeftX()), climbSub));
 
-        climbUp.whileTrue(new ClimbMove(0.3, climbSub));
-        climbDown.whileTrue(new ClimbMove(-0.3, climbSub));
+        climbUp.whileTrue(new ClimbMove(-0.15, climbSub));
+        climbDown.whileTrue(new ClimbMove(0.15, climbSub));
 
         // armUp.whileTrue(new ArmMove(armSub, 0.1));
         // armDown.whileTrue(new ArmMove(armSub, -0.1));

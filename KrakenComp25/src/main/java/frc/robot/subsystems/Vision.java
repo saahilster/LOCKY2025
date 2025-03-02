@@ -88,59 +88,58 @@ public class Vision extends SubsystemBase {
       _pose = est.estimatedPose.toPose2d();
       double timestamp = est.timestampSeconds;
       driveTrain.addVisionMeasurement(driveTrain.getState().Pose, timestamp);
-      System.out.println("Vision Pose: " + est.estimatedPose.toPose2d());
     });
   }
 
   // TODO: Find translation and rotation distances from april tags
   // TODO: Find how to drive request to position based off of april tags
-  public void GetReefTarget() {
-    var results = camera.getAllUnreadResults();
-    if (!results.isEmpty()) {
-      var result = results.get(results.size() - 1);
-      if (result.hasTargets()) {
-        System.out.println("results found");
+  // public void GetReefTarget() {
+  //   var results = camera.getAllUnreadResults();
+  //   if (!results.isEmpty()) {
+  //     var result = results.get(results.size() - 1);
+  //     if (result.hasTargets()) {
+  //       System.out.println("results found");
 
-        for (var target : result.getTargets()) {
-          if (target.getFiducialId() == 6 ||
-              target.getFiducialId() == 7 ||
-              target.getFiducialId() == 8 ||
-              target.getFiducialId() == 9 ||
-              target.getFiducialId() == 10 ||
-              target.getFiducialId() == 11) {
+  //       for (var target : result.getTargets()) {
+  //         if (target.getFiducialId() == 6 ||
+  //             target.getFiducialId() == 7 ||
+  //             target.getFiducialId() == 8 ||
+  //             target.getFiducialId() == 9 ||
+  //             target.getFiducialId() == 10 ||
+  //             target.getFiducialId() == 11) {
 
-            targetYaw = target.getYaw();
-            targetRange = PhotonUtils.calculateDistanceToTargetMeters(
-                Units.feetToMeters(cameraHeight),
-                Units.inchesToMeters(8.75),
-                Units.degreesToRadians(cameraPitch),
-                Units.degreesToRadians(target.getPitch()));
-            targetVisible = true;
-          }
-        }
-      }
-      else{
-        targetVisible = false;
-      }
-    }
-  }
+  //           targetYaw = target.getYaw();
+  //           targetRange = PhotonUtils.calculateDistanceToTargetMeters(
+  //               Units.feetToMeters(cameraHeight),
+  //               Units.inchesToMeters(8.75),
+  //               Units.degreesToRadians(cameraPitch),
+  //               Units.degreesToRadians(target.getPitch()));
+  //           targetVisible = true;
+  //         }
+  //       }
+  //     }
+  //     else{
+  //       targetVisible = false;
+  //     }
+  //   }
+  // }
 
-  public Command RequestReef(){
-    Command pathFindingCommand = null;
+  // public Command RequestReef(){
+  //   Command pathFindingCommand = null;
 
-    var waypoints = PathPlannerPath.waypointsFromPoses(
-      new Pose2d());
+  //   var waypoints = PathPlannerPath.waypointsFromPoses(
+  //     new Pose2d());
 
-    PathPlannerPath path = new PathPlannerPath(
-      null, 
-      null, 
-      null, 
-      null);
+  //   PathPlannerPath path = new PathPlannerPath(
+  //     null, 
+  //     null, 
+  //     null, 
+  //     null);
 
-    pathFindingCommand = AutoBuilder.followPath(path);
+  //   pathFindingCommand = AutoBuilder.followPath(path);
 
-    return pathFindingCommand;
-  }
+  //   return pathFindingCommand;
+  // }
 
 
   @Override
