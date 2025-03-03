@@ -79,7 +79,7 @@
               {
                 "type": "wait",
                 "data": {
-                  "waitTime": 1.3
+                  "waitTime": 1.5
                 }
               },
               {
@@ -95,7 +95,7 @@
                     {
                       "type": "wait",
                       "data": {
-                        "waitTime": 0.3
+                        "waitTime": 0.5
                       }
                     },
                     {
@@ -107,7 +107,7 @@
                     {
                       "type": "wait",
                       "data": {
-                        "waitTime": 0.4
+                        "waitTime": 0.6
                       }
                     },
                     {
@@ -133,25 +133,6 @@
                       "data": {
                         "waitTime": 0.4
                       }
-                    },
-                    {
-                      "type": "parallel",
-                      "data": {
-                        "commands": [
-                          {
-                            "type": "named",
-                            "data": {
-                              "name": "L2 Arm"
-                            }
-                          },
-                          {
-                            "type": "named",
-                            "data": {
-                              "name": "L2 Height"
-                            }
-                          }
-                        ]
-                      }
                     }
                   ]
                 }
@@ -160,15 +141,40 @@
           }
         },
         {
-          "type": "path",
+          "type": "parallel",
           "data": {
-            "pathName": "BlueRightC"
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "BlueRightC"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "L3 Height"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "L3 Arm"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.3
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "L2 Place"
+            "name": "L3 Place"
           }
         }
       ]

@@ -62,7 +62,7 @@ public class RobotContainer {
 
     private double coralHeight = 16.18,
     L4Height = 56.504,
-    L3Height = 32.293,
+    L3Height = 33.293,
     L2Height = 15;
 
     public double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
@@ -137,7 +137,7 @@ public class RobotContainer {
 
         NamedCommands.registerCommand("L3 Arm", new ArmMagic(armSub, -37).withTimeout(0.4));
         NamedCommands.registerCommand("L3 Height", new CascadeMagic(elevatorSub, L3Height).withTimeout(1.6));
-        NamedCommands.registerCommand("L3 Place", new ArmMagic(armSub, -67));
+        NamedCommands.registerCommand("L3 Place", new ArmMagic(armSub, -74));
 
         NamedCommands.registerCommand("L4 Arm", new ArmMagic(armSub, -24.345703125).withTimeout(0.4));
         NamedCommands.registerCommand("L4 Height", new CascadeMagic(elevatorSub, L4Height).withTimeout(1.75));
@@ -150,7 +150,7 @@ public class RobotContainer {
 
         NamedCommands.registerCommand("Arm Clearance Height", new CascadeMagic(elevatorSub, 46.2449).withTimeout(0.5));
         NamedCommands.registerCommand("Bite Height", new CascadeMagic(elevatorSub, 34.3845).withTimeout(0.5));
-        NamedCommands.registerCommand("Bite Angle", new ArmMagic(armSub, -182).withTimeout(0.5));
+        NamedCommands.registerCommand("Bite Angle", new ArmMagic(armSub, -182).withTimeout(0.75));
         NamedCommands.registerCommand("Cruise Arm Angle", new ArmMagic(armSub, -30).withTimeout(0.3));
                                                
         configureBindings();
@@ -224,7 +224,7 @@ public class RobotContainer {
                                         // Add a delay to the ArmMagic command
                                         new SequentialCommandGroup(
                                                 new WaitCommand(0.2), // Adjust the delay time (in seconds) as needed
-                                                new ArmMagic(armSub, -180).withTimeout(0.5)))
+                                                new ArmMagic(armSub, -177).withTimeout(0.5)))
                                 .andThen(
                                         new WaitCommand(0.65),
                                         new CascadeMagic(elevatorSub, 32.38456285565362).withTimeout(0.5)
@@ -272,8 +272,8 @@ public class RobotContainer {
         armSub.setDefaultCommand(new RunCommand(() -> armSub.ManualMove(-operator.getRightY() * 0.5), armSub));
         // climbSub.setDefaultCommand(new RunCommand(()-> climbSub.Move(operator.getLeftX()), climbSub));
 
-        climbUp.whileTrue(new ClimbMove(-0.15, climbSub));
-        climbDown.whileTrue(new ClimbMove(0.15, climbSub));
+        climbUp.whileTrue(new ClimbMove(-0.85, climbSub));
+        climbDown.whileTrue(new ClimbMove(0.85, climbSub));
 
         // armUp.whileTrue(new ArmMove(armSub, 0.1));
         // armDown.whileTrue(new ArmMove(armSub, -0.1));
