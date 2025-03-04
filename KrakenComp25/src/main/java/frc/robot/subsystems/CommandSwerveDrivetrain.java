@@ -355,10 +355,10 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         return pose;
     }
 
-    // @Override
-    // public void addVisionMeasurement(Pose2d visionRobotPoseMeters, double timestampSeconds) {
-    //     super.addVisionMeasurement(visionRobotPoseMeters, Utils.fpgaToCurrentTime(timestampSeconds));
-    // }
+    @Override
+    public void addVisionMeasurement(Pose2d visionRobotPoseMeters, double timestampSeconds) {
+        super.addVisionMeasurement(visionRobotPoseMeters, Utils.fpgaToCurrentTime(timestampSeconds));
+    }
 
     // /**
     //  * Adds a vision measurement to the Kalman Filter. This will correct the odometry pose estimate

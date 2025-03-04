@@ -224,9 +224,9 @@ public class RobotContainer {
                                         // Add a delay to the ArmMagic command
                                         new SequentialCommandGroup(
                                                 new WaitCommand(0.2), // Adjust the delay time (in seconds) as needed
-                                                new ArmMagic(armSub, -177).withTimeout(0.5)))
+                                                new ArmMagic(armSub, -178).withTimeout(0.5)))
                                 .andThen(
-                                        new WaitCommand(0.65),
+                                        new WaitCommand(0.85),
                                         new CascadeMagic(elevatorSub, 32.38456285565362).withTimeout(0.5)
                                                 .andThen(new CascadeMagic(elevatorSub, 46.24491881238843)
                                                         .withTimeout(0.5).alongWith(new WaitCommand(0.3))
