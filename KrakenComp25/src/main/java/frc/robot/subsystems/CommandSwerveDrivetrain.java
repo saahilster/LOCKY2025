@@ -270,7 +270,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     public void periodic() {
 
         // System.out.println(pose);
-        Logger.recordOutput("pose", GetCurrentPose());
+        // Logger.recordOutput("pose", GetCurrentPose());
         /*
          * Periodically try to apply the operator perspective.
          * If we haven't applied the operator perspective before, then we should apply

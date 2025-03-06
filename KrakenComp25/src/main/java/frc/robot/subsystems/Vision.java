@@ -63,12 +63,12 @@ public class Vision extends SubsystemBase {
   //Singleton
   private static Vision instance;
 
-  public static Vision getInstance(){
-    if(instance == null){
-      instance = new Vision();
-    }
-    return instance;
-  }
+  // public static Vision getInstance(){
+  //   if(instance == null){
+  //     instance = new Vision();
+  //   }
+  //   return instance;
+  // }
 
   public Vision() {
   }
@@ -145,7 +145,7 @@ public class Vision extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    UpdatePose();
-    Logger.recordOutput("VisionPose", driveTrain.getState().Pose);    
+    // UpdatePose();
+    // Logger.recordOutput("VisionPose", driveTrain.getState().Pose);    
   }
 }
