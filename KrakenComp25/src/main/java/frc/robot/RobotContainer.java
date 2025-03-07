@@ -268,9 +268,9 @@ public class RobotContainer {
         L2Button.whileFalse(new RunCommand(()-> ledSub.TestLED(255, 0, 0),
         ledSub));
 
-        elevatorSub.setDefaultCommand(new RunCommand(() -> elevatorSub.ManualMove(-operator.getRawAxis(1) * 0.9), elevatorSub));
+        elevatorSub.setDefaultCommand(new RunCommand(() -> elevatorSub.ManualMove(-operator.getRawAxis(1) * 0.2), elevatorSub));
 
-        armSub.setDefaultCommand(new RunCommand(() -> armSub.ManualMove(-operator.getRawAxis(5) * 0.5), armSub));
+        armSub.setDefaultCommand(new RunCommand(() -> armSub.ManualMove(-operator.getRawAxis(5) * 0.25), armSub));
         // climbSub.setDefaultCommand(new RunCommand(()-> climbSub.Move(operator.getLeftX()), climbSub));
 
         climbUp.whileTrue(new ClimbMove(-0.85, climbSub));
