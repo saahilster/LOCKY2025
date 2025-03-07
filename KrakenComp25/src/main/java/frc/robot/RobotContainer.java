@@ -17,6 +17,7 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.PS5Controller;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -79,8 +80,8 @@ public class RobotContainer {
 
     private SendableChooser<Command> autoChooser;
 
-    public final PS5Controller driver = new PS5Controller(0);
-    public final PS5Controller operator = new PS5Controller(1);
+    public final Joystick driver = new Joystick(0);
+    public final Joystick operator = new Joystick(1);
 
     // DRIVER INPUTS
     private final JoystickButton brakeButton = new JoystickButton(driver, ControllerConstants.b_L2);
@@ -165,19 +166,19 @@ public class RobotContainer {
         drivetrain.setDefaultCommand(
             // Drivetrain will execute this command periodically
             drivetrain.applyRequest(() ->
-                drive.withVelocityX(-driver.getLeftY() * MaxSpeed) // Drive forward with negative Y (forward)
-                    .withVelocityY(-driver.getLeftX() * MaxSpeed) // Drive left with negative X (left)
-                    .withRotationalRate(-driver.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
+                drive.withVelocityX(-driver.getRawAxis(1) * MaxSpeed) // Drive forward with negative Y (forward)
+                    .withVelocityY(-driver.getRawAxis(0) * MaxSpeed) // Drive left with negative X (left)
+                    .withRotationalRate(-driver.getRawAxis(2) * MaxAngularRate) // Drive counterclockwise with negative X (left)
             )
         );
 
     
-            slowButton.whileTrue(drivetrain.applyRequest(() -> drive.withVelocityX(-driver.getLeftY() * 1) // Drive
+            slowButton.whileTrue(drivetrain.applyRequest(() -> drive.withVelocityX(-driver.getRawAxis(1) * 1) // Drive
                                                                                                      // forward with
                                                                                                      // negative Y
                                                                                                      // (forward)
-            .withVelocityY(-driver.getLeftX() * 1.5) // Drive left with negative X (left)
-            .withRotationalRate(-driver.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X
+            .withVelocityY(-driver.getRawAxis(0)* 1.5) // Drive left with negative X (left)
+            .withRotationalRate(-driver.getAxisType(2) * MaxAngularRate) // Drive counterclockwise with negative X
                                                                       // (left)
         ));
 
@@ -267,9 +268,9 @@ public class RobotContainer {
         L2Button.whileFalse(new RunCommand(()-> ledSub.TestLED(255, 0, 0),
         ledSub));
 
-        elevatorSub.setDefaultCommand(new RunCommand(() -> elevatorSub.ManualMove(-operator.getLeftY() * 0.9), elevatorSub));
+        elevatorSub.setDefaultCommand(new RunCommand(() -> elevatorSub.ManualMove(-operator.getRawAxis(1) * 0.9), elevatorSub));
 
-        armSub.setDefaultCommand(new RunCommand(() -> armSub.ManualMove(-operator.getRightY() * 0.5), armSub));
+        armSub.setDefaultCommand(new RunCommand(() -> armSub.ManualMove(-operator.getRawAxis(5) * 0.5), armSub));
         // climbSub.setDefaultCommand(new RunCommand(()-> climbSub.Move(operator.getLeftX()), climbSub));
 
         climbUp.whileTrue(new ClimbMove(-0.85, climbSub));
