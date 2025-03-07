@@ -166,8 +166,8 @@ public class RobotContainer {
         drivetrain.setDefaultCommand(
             // Drivetrain will execute this command periodically
             drivetrain.applyRequest(() ->
-                drive.withVelocityX(-driver.getRawAxis(1) * MaxSpeed) // Drive forward with negative Y (forward)
-                    .withVelocityY(-driver.getRawAxis(0) * MaxSpeed) // Drive left with negative X (left)
+                drive.withVelocityX(-driver.getRawAxis(1) * 1) // Drive forward with negative Y (forward)
+                    .withVelocityY(-driver.getRawAxis(0) * 1) // Drive left with negative X (left)
                     .withRotationalRate(-driver.getRawAxis(2) * MaxAngularRate) // Drive counterclockwise with negative X (left)
             )
         );
@@ -177,7 +177,7 @@ public class RobotContainer {
                                                                                                      // forward with
                                                                                                      // negative Y
                                                                                                      // (forward)
-            .withVelocityY(-driver.getRawAxis(0)* 1.5) // Drive left with negative X (left)
+            .withVelocityY(-driver.getRawAxis(0)* 1) // Drive left with negative X (left)
             .withRotationalRate(-driver.getAxisType(2) * MaxAngularRate) // Drive counterclockwise with negative X
                                                                       // (left)
         ));
