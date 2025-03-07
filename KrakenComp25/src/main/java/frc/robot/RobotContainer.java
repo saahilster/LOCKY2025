@@ -86,7 +86,7 @@ public class RobotContainer {
     private final JoystickButton brakeButton = new JoystickButton(driver, ControllerConstants.b_L2);
     private final JoystickButton slowButton = new JoystickButton(driver, ControllerConstants.b_R2);
     private final JoystickButton recenterButton = new JoystickButton(driver, ControllerConstants.b_L1);
-    private final JoystickButton moveButton = new JoystickButton(driver, ControllerConstants.b_O);
+//     private final JoystickButton moveButton = new JoystickButton(driver, ControllerConstants.b_O);
     private final JoystickButton intakeButton = new JoystickButton(driver, ControllerConstants.b_X);
     private final JoystickButton outTakeButton = new JoystickButton(driver, ControllerConstants.b_O);
     private final JoystickButton ledTestButton = new JoystickButton(driver, ControllerConstants.b_TRI);
