@@ -234,7 +234,7 @@ public class RobotContainer {
                                                 new ArmMagic(armSub, -178).withTimeout(0.5)))
                                 .andThen(
                                         new WaitCommand(0.75),
-                                        new CascadeMagic(elevatorSub, 32.38456285565362).withTimeout(0.5)
+                                        new CascadeMagic(elevatorSub, 35.42402658704463).withTimeout(0.5)
                                                 .andThen(new CascadeMagic(elevatorSub, 46.24491881238843)
                                                         .withTimeout(0.5).alongWith(new WaitCommand(0.3))
                                                         .andThen(new ArmMagic(armSub, -30))))));

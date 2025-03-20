@@ -124,7 +124,7 @@ public class Elevator extends SubsystemBase {
 
     var elevateMM = cascadeConfig.MotionMagic;
     elevateMM.MotionMagicCruiseVelocity = 7.5;
-    elevateMM.MotionMagicAcceleration = 12;
+    elevateMM.MotionMagicAcceleration = 23;
     elevateMM.MotionMagicJerk = 0;
     leftMotor.getConfigurator().apply(cascadeConfig);
   }
