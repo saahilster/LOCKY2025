@@ -154,7 +154,7 @@ public class RobotContainer {
 
         NamedCommands.registerCommand("Arm Clearance Height", new CascadeMagic(elevatorSub, 46.2449).withTimeout(0.5));
         NamedCommands.registerCommand("Bite Height", new CascadeMagic(elevatorSub, 34.3845).withTimeout(0.5));
-        NamedCommands.registerCommand("Bite Angle", new ArmMagic(armSub, -182).withTimeout(0.75));
+        NamedCommands.registerCommand("Bite Angle", new ArmMagic(armSub, -184).withTimeout(0.75));
         NamedCommands.registerCommand("Cruise Arm Angle", new ArmMagic(armSub, -30).withTimeout(0.3));
                                                
         configureBindings();
